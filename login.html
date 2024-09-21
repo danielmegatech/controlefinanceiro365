@@ -1,0 +1,308 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - FinApp</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --text-color: #2d3748;
+            --primary-color: #4299e1;
+            --secondary-color: #3182ce;
+            --input-bg: #fff;
+            --input-border: #e2e8f0;
+            --box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode {
+            --bg-color: #1a202c;
+            --text-color: #f7fafc;
+            --primary-color: #63b3ed;
+            --secondary-color: #4299e1;
+            --input-bg: #2d3748;
+            --input-border: #4a5568;
+            --box-shadow: 0 10px 25px rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+            overflow: hidden;
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .login-container {
+            background-color: var(--input-bg);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: var(--box-shadow);
+            width: 360px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--primary-color) 0%, transparent 70%);
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.3);
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        button:hover::after {
+            width: 300px;
+            height: 300px;
+            margin-left: -150px;
+            margin-top: -150px;
+        }
+
+        .links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+        }
+
+        .links a {
+            color: var(--primary-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .links a::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            bottom: -4px;
+            left: 0;
+            background-color: var(--primary-color);
+            visibility: hidden;
+            transform: scaleX(0);
+            transition: all 0.3s ease;
+        }
+
+        .links a:hover::after {
+            visibility: visible;
+            transform: scaleX(1);
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(180deg);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-container {
+            animation: fadeIn 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <div id="particles-js"></div>
+    <button class="theme-toggle" id="themeToggle">🌓</button>
+    <div class="login-container">
+        <h1>FinApp</h1>
+        <form id="loginForm">
+            <input type="email" id="email" placeholder="E-mail" required>
+            <input type="password" id="password" placeholder="Senha" required>
+            <button type="submit">Entrar</button>
+        </form>
+        <div class="links">
+            <a href="#" id="forgotPassword">Esqueci a senha</a>
+            <a href="#" id="register">Cadastrar</a>
+        </div>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const loginForm = document.getElementById('loginForm');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const register = document.getElementById('register');
+
+        // Alternar entre modo claro e escuro
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            if (body.classList.contains('dark-mode')) {
+                themeToggle.textContent = '☀️';
+                particlesJS.load('particles-js', {
+                    "particles": {
+                        "number": {"value": 80},
+                        "color": {"value": "#ffffff"},
+                        "shape": {"type": "circle"},
+                        "opacity": {"value": 0.5, "random": true},
+                        "size": {"value": 3, "random": true},
+                        "line_linked": {"enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.4, "width": 1},
+                        "move": {"enable": true, "speed": 2}
+                    }
+                });
+            } else {
+                themeToggle.textContent = '🌙';
+                particlesJS.load('particles-js', {
+                    "particles": {
+                        "number": {"value": 80},
+                        "color": {"value": "#000000"},
+                        "shape": {"type": "circle"},
+                        "opacity": {"value": 0.5, "random": true},
+                        "size": {"value": 3, "random": true},
+                        "line_linked": {"enable": true, "distance": 150, "color": "#000000", "opacity": 0.4, "width": 1},
+                        "move": {"enable": true, "speed": 2}
+                    }
+                });
+            }
+        });
+
+        // Inicializar particles.js
+        particlesJS.load('particles-js', {
+            "particles": {
+                "number": {"value": 80},
+                "color": {"value": "#000000"},
+                "shape": {"type": "circle"},
+                "opacity": {"value": 0.5, "random": true},
+                "size": {"value": 3, "random": true},
+                "line_linked": {"enable": true, "distance": 150, "color": "#000000", "opacity": 0.4, "width": 1},
+                "move": {"enable": true, "speed": 2}
+            }
+        });
+
+        // Simular login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            if (email && password) {
+                alert('Login bem-sucedido! Redirecionando para o dashboard...');
+            } else {
+                alert('Por favor, preencha todos os campos.');
+            }
+        });
+
+        // Função para "Esqueci a senha"
+        forgotPassword.addEventListener('click', (e) => {
+            e.preventDefault();
+            const email = prompt('Digite seu e-mail para redefinir a senha:');
+            if (email) {
+                alert(`Um link de redefinição de senha foi enviado para ${email}`);
+            }
+        });
+
+        // Função para "Cadastrar"
+        register.addEventListener('click', (e) => {
+            e.preventDefault();
+            alert('Redirecionando para a página de cadastro...');
+        });
+
+        // Adicionar efeito de hover nos inputs
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.style.transform = 'translateY(-2px)';
+            });
+            input.addEventListener('blur', () => {
+                input.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

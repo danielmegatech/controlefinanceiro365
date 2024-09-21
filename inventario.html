@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Patrimônio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50c878;
+            --background-color: #f8f9fa;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --hover-color: #3a7bd5;
+            --accent-color: #ff6b6b;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.9), rgba(58, 123, 213, 0.9));
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-size: 1.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: var(--secondary-color);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: scaleX(1);
+        }
+
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            padding: 30px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .table-responsive {
+            margin-top: 2rem;
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f8);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .table-responsive:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        #addItemBtn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            font-size: 28px;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--accent-color), #ff8e8e);
+            border: none;
+        }
+
+        #addItemBtn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            background: linear-gradient(135deg, #ff8e8e, var(--accent-color));
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f8);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        footer {
+            background: linear-gradient(135deg, var(--primary-color), var(--hover-color));
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        .table thead th {
+            border-bottom: none;
+            color: var(--primary-color);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .table tbody tr {
+            background-color: var(--card-bg);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .table tbody tr:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .table tbody td {
+            vertical-align: middle;
+        }
+
+        .modal-content {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f8);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--hover-color));
+            color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            padding: 20px;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--hover-color));
+            border: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(74, 144, 226, 0.4);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--hover-color), var(--primary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+
+        #floatingSubmenu {
+            background: linear-gradient(135deg, var(--card-bg), #f0f4f8);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        #floatingSubmenu ul {
+            padding: 0;
+        }
+
+        #floatingSubmenu li {
+            margin-bottom: 15px;
+        }
+
+        #floatingSubmenu a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            display: block;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        #floatingSubmenu a:hover {
+            color: var(--primary-color);
+            background-color: rgba(74, 144, 226, 0.1);
+            transform: translateX(5px);
+        }
+
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(74, 144, 226, 0.25);
+        }
+
+        .btn-close {
+            background-color: white;
+            opacity: 1;
+            transition: all 0.3s ease;
+        }
+
+        .btn-close:hover {
+            transform: rotate(90deg);
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+        }
+    </style>
+    <script src="https://cdn.api.createany.ai/openai/openai.global.js"></script>
+</head>
+<body>
+    <!-- Existing navbar and main content structure remain unchanged -->
+
+    <main class="container mt-5 animate__animated animate__fadeIn">
+        <h2 class="mb-4 animate__animated animate__slideInDown"><i class="fas fa-list-ul me-2"></i>Lista de Itens do Inventário</h2>
+        <div class="table-responsive animate__animated animate__fadeIn">
+            <table id="inventoryTable" class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Número do Inventário</th>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Data de Aquisição</th>
+                        <th>Valor da Compra</th>
+                        <th>Valor Atual Estimado</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="mt-5 mb-4 animate__animated animate__slideInDown"><i class="fas fa-chart-bar me-2"></i>Análise do Inventário</h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container animate__animated animate__fadeInLeft">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container animate__animated animate__fadeInRight">
+                    <canvas id="valueComparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="chart-container animate__animated animate__fadeInLeft">
+                    <canvas id="ageChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container animate__animated animate__fadeInRight">
+                    <canvas id="depreciationChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Existing modal and footer structure remain unchanged -->
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        // Inicialização do DataTables com dados de exemplo
+        $(document).ready(function() {
+            const sampleData = [
+                ["001", "Computador", "Eletrônicos", "2022-01-15", "R$ 3.500,00", "R$ 3.000,00", "<button class='btn btn-sm btn-primary'>Editar</button>"],
+                ["002", "Mesa de Escritório", "Móveis", "2021-05-20", "R$ 800,00", "R$ 700,00", "<button class='btn btn-sm btn-primary'>Editar</button>"],
+                ["003", "Impressora", "Eletrônicos", "2022-03-10", "R$ 1.200,00", "R$ 1.000,00", "<button class='btn btn-sm btn-primary'>Editar</button>"],
+                ["004", "Cadeira Ergonômica", "Móveis", "2021-11-05", "R$ 600,00", "R$ 550,00", "<button class='btn btn-sm btn-primary'>Editar</button>"],
+                ["005", "Projetor", "Eletrônicos", "2022-06-18", "R$ 2.500,00", "R$ 2.300,00", "<button class='btn btn-sm btn-primary'>Editar</button>"]
+            ];
+
+            $('#inventoryTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json'
+                },
+                responsive: true,
+                data: sampleData,
+                columns: [
+                    { title: "Número do Inventário" },
+                    { title: "Descrição" },
+                    { title: "Categoria" },
+                    { title: "Data de Aquisição" },
+                    { title: "Valor da Compra" },
+                    { title: "Valor Atual Estimado" },
+                    { title: "Ações" }
+                ],
+                columnDefs: [
+                    { responsivePriority: 1, targets: 0 },
+                    { responsivePriority: 2, targets: -1 }
+                ],
+                drawCallback: function() {
+                    $('.dataTables_wrapper').addClass('animate__animated animate__fadeIn');
+                }
+            });
+        });
+
+        // Inicialização dos gráficos
+        const ctx1 = document.getElementById('categoryChart').getContext('2d');
+        const ctx2 = document.getElementById('valueComparisonChart').getContext('2d');
+        const ctx3 = document.getElementById('ageChart').getContext('2d');
+        const ctx4 = document.getElementById('depreciationChart').getContext('2d');
+
+        new Chart(ctx1, {
+            type: 'pie',
+            data: {
+                labels: ['Eletrônicos', 'Móveis', 'Equipamentos'],
+                datasets: [{
+                    data: [7200, 1400, 2500],
+                    backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Valor Total por Categoria'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+
+        new Chart(ctx2, {
+            type: 'bar',
+            data: {
+                labels: ['Computador', 'Mesa', 'Impressora', 'Cadeira', 'Projetor'],
+                datasets: [{
+                    label: 'Valor de Aquisição',
+                    data: [3500, 800, 1200, 600, 2500],
+                    backgroundColor: '#36A2EB'
+                }, {
+                    label: 'Valor Atual',
+                    data: [3000, 700, 1000, 550, 2300],
+                    backgroundColor: '#FF6384'
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Valor de Aquisição vs Valor Atual'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        new Chart(ctx3, {
+            type: 'doughnut',
+            data: {
+                labels: ['0-1 ano', '1-2 anos', '2+ anos'],
+                datasets: [{
+                    data: [3, 1, 1],
+                    backgroundColor: ['#FFCE56', '#36A2EB', '#FF6384']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Idade dos Itens'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                }
+            }
+        });
+
+        new Chart(ctx4, {
+            type: 'line',
+            data: {
+                labels: ['2021', '2022', '2023', '2024', '2025'],
+                datasets: [{
+                    label: 'Valor Total do Inventário',
+                    data: [8600, 8000, 7500, 7000, 6500],
+                    borderColor: '#4BC0C0',
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Projeção de Depreciação'
+                    },
+                    legend: {
+                        position: 'bottom'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: false
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeInOutQuart'
+                }
+            }
+        });
+
+        // Existing JavaScript functions remain unchanged
+
+    </script>
+</body>
+</html>

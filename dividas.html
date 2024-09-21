@@ -1,0 +1,390 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Dívidas - Gerenciamento Financeiro Pessoal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .floating-menu {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+        .floating-menu a {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s;
+        }
+        .floating-menu a:hover {
+            background-color: #e9ecef;
+        }
+        .floating-action-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .floating-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="bg-primary text-white py-3">
+        <div class="container">
+            <h1 class="h3">Gerenciamento Financeiro Pessoal</h1>
+            <nav>
+                <ul class="nav">
+                    <li class="nav-item"><a href="index.html" class="nav-link text-white">Dashboard</a></li>
+                    <li class="nav-item"><a href="controle.html" class="nav-link text-white">Controle Financeiro</a></li>
+                    <li class="nav-item"><a href="dividas.html" class="nav-link text-white">Controle de Dívidas</a></li>
+                    <li class="nav-item"><a href="cartoes.html" class="nav-link text-white">Cartões de Crédito</a></li>
+                    <li class="nav-item"><a href="investimentos.html" class="nav-link text-white">Investimentos</a></li>
+                    <li class="nav-item"><a href="patrimonio.html" class="nav-link text-white">Patrimônio</a></li>
+                    <li class="nav-item"><a href="veiculo.html" class="nav-link text-white">Veículos</a></li>
+                    <li class="nav-item"><a href="configuracoes.html" class="nav-link text-white">Configurações</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container my-5">
+        <h2 class="mb-4">Controle de Dívidas</h2>
+
+        <!-- Adicionar Dívida Form -->
+        <section id="adicionar-divida" class="mb-5">
+            <h3>Adicionar Dívida</h3>
+            <form id="form-adicionar-divida">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="prioridade" class="form-label">Prioridade</label>
+                        <select class="form-select" id="prioridade" required>
+                            <option value="">Selecione...</option>
+                            <option value="alta">Alta</option>
+                            <option value="media">Média</option>
+                            <option value="baixa">Baixa</option>
+                        </select>
+                    </div>
+                    <div class="col-md-9 mb-3">
+                        <label for="descricao" class="form-label">Descrição</label>
+                        <input type="text" class="form-control" id="descricao" required>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="categoria" class="form-label">Categoria</label>
+                        <input type="text" class="form-control" id="categoria" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="tipo-divida" class="form-label">Tipo de Dívida</label>
+                        <select class="form-select" id="tipo-divida" required>
+                            <option value="">Selecione...</option>
+                            <option value="pessoal">Pessoal</option>
+                            <option value="estudantil">Estudantil</option>
+                            <option value="outro">Outro</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label for="contato-credor" class="form-label">Contato do Credor</label>
+                        <input type="text" class="form-control" id="contato-credor">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="valor-original" class="form-label">Valor Original</label>
+                        <input type="number" class="form-control" id="valor-original" step="0.01" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="num-parcelas" class="form-label">Número de Parcelas</label>
+                        <input type="number" class="form-control" id="num-parcelas" required>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="taxa-juros" class="form-label">Taxa de Juros (%)</label>
+                        <input type="number" class="form-control" id="taxa-juros" step="0.01">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="valor-atraso" class="form-label">Valor em Atraso</label>
+                        <input type="number" class="form-control" id="valor-atraso" step="0.01">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="observacoes" class="form-label">Observações</label>
+                    <textarea class="form-control" id="observacoes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Adicionar Dívida</button>
+            </form>
+        </section>
+
+        <!-- Lista de Dívidas -->
+        <section id="lista-dividas" class="mb-5">
+            <h3>Lista de Dívidas</h3>
+            <table id="tabela-dividas" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Valor Original</th>
+                        <th>Parcelas</th>
+                        <th>Status</th>
+                        <th>Total Pendente</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Dashboard -->
+        <section id="dashboard" class="mb-5">
+            <h3>Dashboard de Dívidas</h3>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <canvas id="grafico-status"></canvas>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <canvas id="grafico-evolucao"></canvas>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <canvas id="grafico-comparacao"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h4>Análise Técnica</h4>
+                    <p id="analise-tecnica">
+                        <!-- Será preenchido via JavaScript -->
+                    </p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h4>Estatísticas</h4>
+                    <p id="estatisticas">
+                        <!-- Será preenchido via JavaScript -->
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Floating Submenu -->
+    <div class="floating-menu">
+        <a href="#adicionar-divida">Adicionar Dívida</a>
+        <a href="#lista-dividas">Lista de Dívidas</a>
+        <a href="#dashboard">Dashboard</a>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="btn btn-primary btn-lg rounded-circle floating-action-button" data-bs-toggle="modal" data-bs-target="#modal-adicionar-rapido">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal Adicionar Rápido -->
+    <div class="modal fade" id="modal-adicionar-rapido" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Entrada Rápida</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="form-adicionar-rapido">
+                        <div class="mb-3">
+                            <label for="data-rapido" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="data-rapido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricao-rapido" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="descricao-rapido" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="valor-rapido" class="form-label">Valor</label>
+                            <input type="number" class="form-control" id="valor-rapido" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipo-rapido" class="form-label">Tipo</label>
+                            <select class="form-select" id="tipo-rapido" required>
+                                <option value="">Selecione...</option>
+                                <option value="receita">Receita</option>
+                                <option value="despesa">Despesa</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Adicionar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-3 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p>&copy; 2024 Desenvolvido por <a href="https://daan.dev" target="_blank">dev.daan</a></p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="politicas.html">Política de Privacidade</a> |
+                    <a href="termos.html">Termos de Uso</a> |
+                    <a href="contato.html">Contato</a>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col">
+                    <button id="btn-salvar" class="btn btn-success me-2">Salvar Informações</button>
+                    <button id="btn-exportar" class="btn btn-info me-2">Exportar Dados</button>
+                    <button id="btn-importar" class="btn btn-warning me-2">Importar Backup</button>
+                    <button id="btn-imprimir" class="btn btn-secondary me-2">Imprimir Página</button>
+                    <button id="btn-exportar-pdf" class="btn btn-danger me-2">Exportar em PDF</button>
+                    <button id="btn-exportar-xls" class="btn btn-primary">Exportar em XLS</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+    <script>
+        // criado e desenvolvido por daan.dev, dedicado a radige que me apoia e incentiva a ser uma pessoa melhor.
+
+        $(document).ready(function() {
+            // Inicializar DataTables
+            $('#tabela-dividas').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json'
+                },
+                order: [[0, 'asc']] // Ordenar por data crescente
+            });
+
+            // Inicializar gráficos
+            const ctx1 = document.getElementById('grafico-status').getContext('2d');
+            new Chart(ctx1, {
+                type: 'pie',
+                data: {
+                    labels: ['Em dia', 'Pendente', 'Atrasado'],
+                    datasets: [{
+                        data: [60, 30, 10],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Status das Dívidas'
+                        }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('grafico-evolucao').getContext('2d');
+            new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [{
+                        label: 'Total de Dívidas',
+                        data: [12000, 11500, 11000, 10500, 10000, 9500],
+                        borderColor: '#007bff',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Evolução das Dívidas'
+                        }
+                    }
+                }
+            });
+
+            const ctx3 = document.getElementById('grafico-comparacao').getContext('2d');
+            new Chart(ctx3, {
+                type: 'bar',
+                data: {
+                    labels: ['Dívidas Pagas', 'Dívidas Pendentes'],
+                    datasets: [{
+                        data: [5000, 7000],
+                        backgroundColor: ['#28a745', '#dc3545']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Comparação de Dívidas'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Funções para salvar e carregar dados do localStorage
+            function salvarDados() {
+                const dados = {
+                    dividas: [] // Aqui você adicionaria os dados das dívidas
+                };
+                localStorage.setItem('dadosDividas', JSON.stringify(dados));
+                alert('Dados salvos com sucesso!');
+            }
+
+            function carregarDados() {
+                const dadosSalvos = localStorage.getItem('dadosDividas');
+                if (dadosSalvos) {
+                    const dados = JSON.parse(dadosSalvos);
+                    // Aqui você processaria os dados carregados
+                    console.log('Dados carregados:', dados);
+                }
+            }
+
+            // Event listeners
+            $('#btn-salvar').click(salvarDados);
+            $('#form-adicionar-divida').submit(function(e) {
+                e.preventDefault();
+                // Aqui você adicionaria a lógica para adicionar uma nova dívida
+                alert('Dívida adicionada com sucesso!');
+            });
+
+            $('#form-adicionar-rapido').submit(function(e) {
+                e.preventDefault();
+                // Aqui você adicionaria a lógica para adicionar uma entrada rápida
+                alert('Entrada rápida adicionada com sucesso!');
+            });
+
+            // Carregar dados ao iniciar a página
+            carregarDados();
+
+            // Atualizar análises e estatísticas
+            $('#analise-tecnica').text('Baseado nos dados atuais, sua situação de endividamento está melhorando. Continue focando no pagamento das dívidas de alta prioridade.');
+            $('#estatisticas').text('Total de dívidas: R$ 15.000,00 | Média de juros: 2,5% | Dívida mais antiga: 12 meses');
+        });
+    </script>
+</body>
+</html>

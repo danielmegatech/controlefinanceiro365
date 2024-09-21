@@ -1,0 +1,637 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão Financeira - Patrimônio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <style>
+        body {
+            transition: background-color 0.3s, color 0.3s;
+            padding-bottom: 60px;
+        }
+        .dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        .dark-mode .card {
+            background-color: #444;
+            color: #fff;
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        #floatingMenu {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 1000;
+        }
+        #floatingMenu .btn {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .floating-action-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .dark-mode footer {
+            background-color: #222;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Criado e desenvolvido por daan.dev, dedicado a radige que me apoia e incentiva a ser uma pessoa melhor. -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Gestão Financeira</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="controle.html">Controle Financeiro</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dividas.html">Controle de Dívidas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cartoes.html">Cartões de Crédito</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="investimentos.html">Investimentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="patrimonio.html">Patrimônio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="veiculo.html">Veículos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="configuracoes.html">Configurações</a>
+                    </li>
+                </ul>
+                <button id="darkModeToggle" class="btn btn-outline-primary">
+                    <i class="fas fa-moon"></i> Modo Escuro
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h1>Visualização do Patrimônio Acumulado</h1>
+
+        <section id="dashboard" class="mb-5">
+            <h2>Dashboard</h2>
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Valor Total por Categoria</h5>
+                            <div class="chart-container">
+                                <canvas id="valorPorCategoria"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Valor de Aquisição vs Valor Atual</h5>
+                            <div class="chart-container">
+                                <canvas id="valorAquisicaoVsAtual"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Idade dos Itens</h5>
+                            <div class="chart-container">
+                                <canvas id="idadeItens"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Análise Técnica 1</h5>
+                            <p id="analiseTecnica1">Carregando análise...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Análise Estatística 1</h5>
+                            <p id="analiseEstatistica1">Carregando análise...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="inventario" class="mb-5">
+            <h2>Lista de Itens do Inventário</h2>
+            <div class="table-responsive">
+                <table id="inventarioTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Número do Inventário</th>
+                            <th>Descrição</th>
+                            <th>Categoria</th>
+                            <th>Subcategoria</th>
+                            <th>Data de Aquisição</th>
+                            <th>Valor da Compra</th>
+                            <th>Valor Atual Estimado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Dados serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="metaPatrimonio" class="mb-5">
+            <h2>Meta de Patrimônio</h2>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Progresso da Meta</h5>
+                    <div class="progress">
+                        <div id="progressoMeta" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                    <div class="mt-3">
+                        <label for="metaValor" class="form-label">Definir Meta de Patrimônio:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" id="metaValor" placeholder="Valor da meta">
+                            <button class="btn btn-outline-secondary" type="button" id="definirMeta">Definir</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div id="floatingMenu">
+        <a href="#dashboard" class="btn btn-primary">Dashboard</a>
+        <a href="#inventario" class="btn btn-primary">Inventário</a>
+        <a href="#metaPatrimonio" class="btn btn-primary">Meta</a>
+    </div>
+
+    <div class="floating-action-button">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addEntryModal">
+            <i class="fas fa-plus"></i> Adicionar Item
+        </button>
+    </div>
+
+    <!-- Modal para adicionar entrada -->
+    <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEntryModalLabel">Adicionar Item ao Inventário</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEntryForm">
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="descricao" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoria" class="form-label">Categoria</label>
+                            <input type="text" class="form-control" id="categoria" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subcategoria" class="form-label">Subcategoria</label>
+                            <input type="text" class="form-control" id="subcategoria">
+                        </div>
+                        <div class="mb-3">
+                            <label for="dataAquisicao" class="form-label">Data de Aquisição</label>
+                            <input type="date" class="form-control" id="dataAquisicao" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="valorCompra" class="form-label">Valor da Compra</label>
+                            <input type="number" class="form-control" id="valorCompra" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="valorAtual" class="form-label">Valor Atual Estimado</label>
+                            <input type="number" class="form-control" id="valorAtual" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEntry">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <button id="saveData" class="btn btn-primary">Salvar Informações</button>
+                    <button id="exportData" class="btn btn-secondary">Exportar Dados</button>
+                    <button id="importData" class="btn btn-secondary">Importar Backup</button>
+                    <button id="printPage" class="btn btn-secondary">Imprimir Página</button>
+                    <button id="exportPDF" class="btn btn-secondary">Exportar em PDF</button>
+                    <button id="exportXLS" class="btn btn-secondary">Exportar em XLS</button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>Desenvolvido por [dev.daan] © 2024</p>
+                    <p>
+                        <a href="politicas.html">Política de Privacidade</a> |
+                        <a href="termos.html">Termos de Uso</a> |
+                        <a href="contato.html">Contato</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Dark mode toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        darkModeToggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeButton(isDarkMode);
+        });
+
+        function updateDarkModeButton(isDarkMode) {
+            const icon = darkModeToggle.querySelector('i');
+            const text = darkModeToggle.lastChild;
+            if (isDarkMode) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                text.textContent = ' Modo Claro';
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                text.textContent = ' Modo Escuro';
+            }
+        }
+
+        // Check for saved dark mode preference
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            body.classList.add('dark-mode');
+            updateDarkModeButton(true);
+        }
+
+        // Sample data for charts and table
+        let inventarioData = [
+            { id: 1, descricao: "Casa", categoria: "Imóveis", subcategoria: "Residencial", dataAquisicao: "2020-01-15", valorCompra: 500000, valorAtual: 550000 },
+            { id: 2, descricao: "Carro", categoria: "Veículos", subcategoria: "Automóvel", dataAquisicao: "2021-05-20", valorCompra: 80000, valorAtual: 75000 },
+            { id: 3, descricao: "Ações", categoria: "Investimentos", subcategoria: "Renda Variável", dataAquisicao: "2022-03-10", valorCompra: 50000, valorAtual: 55000 },
+            { id: 4, descricao: "Notebook", categoria: "Eletrônicos", subcategoria: "Computadores", dataAquisicao: "2023-01-05", valorCompra: 5000, valorAtual: 4000 }
+        ];
+
+        // Initialize DataTable
+        let table;
+        $(document).ready(function() {
+            table = $('#inventarioTable').DataTable({
+                data: inventarioData,
+                columns: [
+                    { data: 'id' },
+                    { data: 'descricao' },
+                    { data: 'categoria' },
+                    { data: 'subcategoria' },
+                    { data: 'dataAquisicao' },
+                    { 
+                        data: 'valorCompra',
+                        render: $.fn.dataTable.render.number(',', '.', 2, 'R$ ')
+                    },
+                    { 
+                        data: 'valorAtual',
+                        render: $.fn.dataTable.render.number(',', '.', 2, 'R$ ')
+                    },
+                    {
+                        data: null,
+                        render: function(data, type, row) {
+                            return '<button class="btn btn-warning btn-sm edit-btn">Editar</button> ' +
+                                   '<button class="btn btn-danger btn-sm delete-btn">Excluir</button>';
+                        }
+                    }
+                ],
+                order: [[4, 'asc']], // Ordenar por data de aquisição
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.25/i18n/Portuguese-Brasil.json'
+                }
+            });
+
+            // Edit button click handler
+            $('#inventarioTable').on('click', '.edit-btn', function() {
+                const data = table.row($(this).parents('tr')).data();
+                // Implement edit functionality here
+                console.log('Edit clicked for:', data);
+            });
+
+            // Delete button click handler
+            $('#inventarioTable').on('click', '.delete-btn', function() {
+                const data = table.row($(this).parents('tr')).data();
+                if (confirm(`Tem certeza que deseja excluir o item "${data.descricao}"?`)) {
+                    table.row($(this).parents('tr')).remove().draw();
+                    inventarioData = inventarioData.filter(item => item.id !== data.id);
+                    updateAnalises();
+                    updateCharts();
+                }
+            });
+        });
+
+        // Create charts
+        function createPieChart(canvasId, title, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.8)',
+                            'rgba(54, 162, 235, 0.8)',
+                            'rgba(255, 206, 86, 0.8)',
+                            'rgba(75, 192, 192, 0.8)',
+                            'rgba(153, 102, 255, 0.8)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title
+                        }
+                    }
+                }
+            });
+        }
+
+        function createBarChart(canvasId, title, data) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, {
+                type: 'bar',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: title
+                        }
+                    }
+                }
+            });
+        }
+
+        let charts = {};
+
+        function initCharts() {
+            charts.valorPorCategoria = createPieChart('valorPorCategoria', 'Valor Total por Categoria', getCategoriasData());
+            charts.valorAquisicaoVsAtual = createBarChart('valorAquisicaoVsAtual', 'Valor de Aquisição vs Valor Atual', getAquisicaoVsAtualData());
+            charts.idadeItens = createBarChart('idadeItens', 'Idade dos Itens', getIdadeItensData());
+        }
+
+        function updateCharts() {
+            const categoriasData = getCategoriasData();
+            charts.valorPorCategoria.data.labels = categoriasData.labels;
+            charts.valorPorCategoria.data.datasets[0].data = categoriasData.data;
+            charts.valorPorCategoria.update();
+
+            const aquisicaoVsAtualData = getAquisicaoVsAtualData();
+            charts.valorAquisicaoVsAtual.data = aquisicaoVsAtualData;
+            charts.valorAquisicaoVsAtual.update();
+
+            const idadeItensData = getIdadeItensData();
+            charts.idadeItens.data = idadeItensData;
+            charts.idadeItens.update();
+        }
+
+        function getCategoriasData() {
+            const categorias = {};
+            inventarioData.forEach(item => {
+                if (categorias[item.categoria]) {
+                    categorias[item.categoria] += item.valorAtual;
+                } else {
+                    categorias[item.categoria] = item.valorAtual;
+                }
+            });
+            return {
+                labels: Object.keys(categorias),
+                data: Object.values(categorias)
+            };
+        }
+
+        function getAquisicaoVsAtualData() {
+            const aquisicao = inventarioData.reduce((sum, item) => sum + item.valorCompra, 0);
+            const atual = inventarioData.reduce((sum, item) => sum + item.valorAtual, 0);
+            return {
+                labels: ['Valor de Aquisição', 'Valor Atual'],
+                datasets: [
+                    {
+                        label: 'Valor Total',
+                        data: [aquisicao, atual],
+                        backgroundColor: ['rgba(54, 162, 235, 0.8)', 'rgba(75, 192, 192, 0.8)']
+                    }
+                ]
+            };
+        }
+
+        function getIdadeItensData() {
+            const hoje = new Date();
+            const idades = inventarioData.map(item => {
+                const dataAquisicao = new Date(item.dataAquisicao);
+                return Math.floor((hoje - dataAquisicao) / (365.25 * 24 * 60 * 60 * 1000));
+            });
+            const idadesCategorias = ['0-1 ano', '1-3 anos', '3-5 anos', '5+ anos'];
+            const idadesContagem = [0, 0, 0, 0];
+            idades.forEach(idade => {
+                if (idade <= 1) idadesContagem[0]++;
+                else if (idade <= 3) idadesContagem[1]++;
+                else if (idade <= 5) idadesContagem[2]++;
+                else idadesContagem[3]++;
+            });
+            return {
+                labels: idadesCategorias,
+                datasets: [{
+                    label: 'Quantidade de Itens',
+                    data: idadesContagem,
+                    backgroundColor: 'rgba(153, 102, 255, 0.8)'
+                }]
+            };
+        }
+
+        // Análises técnicas e estatísticas
+        function updateAnalises() {
+            const valorTotal = inventarioData.reduce((sum, item) => sum + item.valorAtual, 0);
+            const valorMedio = valorTotal / inventarioData.length;
+            
+            document.getElementById('analiseTecnica1').textContent = `O valor total do patrimônio é R$ ${valorTotal.toFixed(2)}, com uma média de R$ ${valorMedio.toFixed(2)} por item.`;
+            
+            const maisValioso = inventarioData.reduce((prev, current) => (prev.valorAtual > current.valorAtual) ? prev : current);
+            document.getElementById('analiseEstatistica1').textContent = `O item mais valioso é "${maisValioso.descricao}" na categoria "${maisValioso.categoria}", avaliado em R$ ${maisValioso.valorAtual.toFixed(2)}.`;
+        }
+
+        // Meta de Patrimônio
+        const definirMetaBtn = document.getElementById('definirMeta');
+        const metaValorInput = document.getElementById('metaValor');
+        const progressoMeta = document.getElementById('progressoMeta');
+
+        definirMetaBtn.addEventListener('click', () => {
+            const metaValor = parseFloat(metaValorInput.value);
+            if (isNaN(metaValor) || metaValor <= 0) {
+                alert('Por favor, insira um valor válido para a meta.');
+                return;
+            }
+
+            const patrimonioAtual = inventarioData.reduce((sum, item) => sum + item.valorAtual, 0);
+            const progresso = (patrimonioAtual / metaValor) * 100;
+            const progressoLimitado = Math.min(100, progresso);
+
+            progressoMeta.style.width = `${progressoLimitado}%`;
+            progressoMeta.setAttribute('aria-valuenow', progressoLimitado);
+            progressoMeta.textContent = `${progressoLimitado.toFixed(2)}%`;
+
+            localStorage.setItem('metaPatrimonio', metaValor);
+        });
+
+        // Carregar meta salva, se existir
+        const metaSalva = localStorage.getItem('metaPatrimonio');
+        if (metaSalva) {
+            metaValorInput.value = metaSalva;
+            definirMetaBtn.click();
+        }
+
+        // Adicionar novo item
+        document.getElementById('saveEntry').addEventListener('click', function() {
+            const newItem = {
+                id: inventarioData.length + 1,
+                descricao: document.getElementById('descricao').value,
+                categoria: document.getElementById('categoria').value,
+                subcategoria: document.getElementById('subcategoria').value,
+                dataAquisicao: document.getElementById('dataAquisicao').value,
+                valorCompra: parseFloat(document.getElementById('valorCompra').value),
+                valorAtual: parseFloat(document.getElementById('valorAtual').value)
+            };
+
+            inventarioData.push(newItem);
+            table.row.add(newItem).draw();
+            $('#addEntryModal').modal('hide');
+            updateAnalises();
+            updateCharts();
+        });
+
+        // Funções para os botões do rodapé
+        document.getElementById('saveData').addEventListener('click', function() {
+            localStorage.setItem('inventarioData', JSON.stringify(inventarioData));
+            alert('Dados salvos com sucesso!');
+        });
+
+        document.getElementById('exportData').addEventListener('click', function() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(inventarioData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "inventario_export.json");
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        });
+
+        document.getElementById('importData').addEventListener('click', function() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.readAsText(file, 'UTF-8');
+                reader.onload = readerEvent => {
+                    const content = readerEvent.target.result;
+                    try {
+                        inventarioData = JSON.parse(content);
+                        table.clear().rows.add(inventarioData).draw();
+                        updateAnalises();
+                        updateCharts();
+                        alert('Dados importados com sucesso!');
+                    } catch (error) {
+                        alert('Erro ao importar dados. Verifique o formato do arquivo.');
+                    }
+                }
+            }
+            input.click();
+        });
+
+        document.getElementById('printPage').addEventListener('click', function() {
+            window.print();
+        });
+
+        document.getElementById('exportPDF').addEventListener('click', function() {
+            alert('Funcionalidade de exportação para PDF será implementada em breve.');
+        });
+
+        document.getElementById('exportXLS').addEventListener('click', function() {
+            alert('Funcionalidade de exportação para XLS será implementada em breve.');
+        });
+
+        // Carregar dados salvos, se existirem
+        const savedData = localStorage.getItem('inventarioData');
+        if (savedData) {
+            inventarioData = JSON.parse(savedData);
+            if (table) {
+                table.clear().rows.add(inventarioData).draw();
+            }
+            updateAnalises();
+        }
+
+        // Inicializar gráficos após o carregamento da página
+        window.addEventListener('load', function() {
+            initCharts();
+            updateAnalises();
+        });
+    </script>
+</body>
+</html>

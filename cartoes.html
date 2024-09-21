@@ -1,0 +1,669 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.24/js/dataTables.bootstrap5.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: 0.3s;
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        .content {
+            flex: 1 0 auto;
+        }
+        footer {
+            flex-shrink: 0;
+            background-color: #f8f9fa;
+            padding: 20px 0;
+        }
+        #floating-menu {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        #floating-menu a {
+            display: block;
+            margin-bottom: 5px;
+        }
+        #floating-action-button {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1000;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- criado e desenvolvido por daan.dev, dedicado a radige que me apoia e incentiva a ser uma pessoa melhor. -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Controle Financeiro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="controle.html">Controle Financeiro</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dividas.html">Controle de Dívidas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cartoes.html">Cartões de Crédito</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="investimentos.html">Investimentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="patrimonio.html">Patrimônio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="veiculo.html">Veículos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="configuracoes.html">Configurações</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="floating-menu">
+        <a href="#transacoes">Transações</a>
+        <a href="#analise">Análise</a>
+        <a href="#relatorios">Relatórios</a>
+    </div>
+
+    <div id="floating-action-button">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#quickEntryModal">
+            <i class="fas fa-plus"></i> Adicionar
+        </button>
+    </div>
+
+    <div class="content container mt-4">
+        <section id="transacoes">
+            <h2>Lista de Transações</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form id="transactionForm">
+                        <div class="row g-3">
+                            <div class="col-md-2">
+                                <input type="date" class="form-control" id="date" required>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="card" required>
+                                    <option value="">Selecione o Cartão</option>
+                                    <option value="Banco Principal">Banco Principal</option>
+                                    <option value="Banco Secundário">Banco Secundário</option>
+                                    <option value="Banco Alternativo1">Banco Alternativo1</option>
+                                    <option value="Banco Alternativo2">Banco Alternativo2</option>
+                                    <option value="Cartão de Crédito Parcelado">Cartão de Crédito Parcelado</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="number" class="form-control" id="amount" placeholder="Valor" step="0.01" required>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="location" placeholder="Local" required>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="category" required>
+                                    <option value="">Categoria</option>
+                                    <option value="🏠 Moradia">🏠 Moradia</option>
+                                    <option value="🛒 Compras">🛒 Compras</option>
+                                    <option value="🍽️ Restaurantes">🍽️ Restaurantes</option>
+                                    <option value="✈️ Viagens">✈️ Viagens</option>
+                                    <option value="🏥 Saúde">🏥 Saúde</option>
+                                    <option value="🚍 Transporte">🚍 Transporte</option>
+                                    <option value="📚 Cursos">📚 Cursos</option>
+                                    <option value="🎮 Jogos">🎮 Jogos</option>
+                                    <option value="🎁 Presentes">🎁 Presentes</option>
+                                    <option value="🎉 Diversão">🎉 Diversão</option>
+                                    <option value="🔄 Outros">🔄 Outros</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-primary w-100">Adicionar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="transactionTable" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Cartão</th>
+                            <th>Valor</th>
+                            <th>Local</th>
+                            <th>Categoria</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionTableBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="analise" class="mt-5">
+            <h2>Análise de Cartões</h2>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Gastos por Cartão</h5>
+                            <div class="chart-container">
+                                <canvas id="cardSpendingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Gastos por Categoria</h5>
+                            <div class="chart-container">
+                                <canvas id="categorySpendingChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Evolução de Gastos</h5>
+                            <div class="chart-container">
+                                <canvas id="spendingTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Análise Técnica</h5>
+                            <div id="technicalAnalysis"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h5 class="card-title">Estatísticas Dinâmicas</h5>
+                            <div id="dynamicStatistics"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="relatorios" class="mt-5">
+            <h2>Relatórios</h2>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Resumo Mensal</h5>
+                    <div id="monthlyReport"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <div class="modal fade" id="quickEntryModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Adicionar Entrada Rápida</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="quickEntryForm">
+                        <div class="mb-3">
+                            <label for="quickDate" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="quickDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickDescription" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="quickDescription" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickAmount" class="form-label">Valor</label>
+                            <input type="number" class="form-control" id="quickAmount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickType" class="form-label">Tipo</label>
+                            <select class="form-select" id="quickType" required>
+                                <option value="Despesa">Despesa</option>
+                                <option value="Receita">Receita</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickCategory" class="form-label">Categoria</label>
+                            <select class="form-select" id="quickCategory" required>
+                                <option value="🏠 Moradia">🏠 Moradia</option>
+                                <option value="🛒 Compras">🛒 Compras</option>
+                                <option value="🍽️ Restaurantes">🍽️ Restaurantes</option>
+                                <option value="✈️ Viagens">✈️ Viagens</option>
+                                <option value="🏥 Saúde">🏥 Saúde</option>
+                                <option value="🚍 Transporte">🚍 Transporte</option>
+                                <option value="📚 Cursos">📚 Cursos</option>
+                                <option value="🎮 Jogos">🎮 Jogos</option>
+                                <option value="🎁 Presentes">🎁 Presentes</option>
+                                <option value="🎉 Diversão">🎉 Diversão</option>
+                                <option value="🔄 Outros">🔄 Outros</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickAccount" class="form-label">Conta</label>
+                            <select class="form-select" id="quickAccount" required>
+                                <option value="Banco Principal">Banco Principal</option>
+                                <option value="Banco Secundário">Banco Secundário</option>
+                                <option value="Banco Alternativo1">Banco Alternativo1</option>
+                                <option value="Banco Alternativo2">Banco Alternativo2</option>
+                                <option value="Cartão de Crédito Parcelado">Cartão de Crédito Parcelado</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickPaymentMethod" class="form-label">Forma de Pagamento</label>
+                            <select class="form-select" id="quickPaymentMethod" required>
+                                <option value="Dinheiro">Dinheiro</option>
+                                <option value="Cartão de Débito">Cartão de Débito</option>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                <option value="Transferência">Transferência</option>
+                                <option value="Pix">Pix</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quickNotes" class="form-label">Observações</label>
+                            <textarea class="form-control" id="quickNotes" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" onclick="addQuickEntry()">Adicionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <button class="btn btn-primary mb-2" onclick="saveData()">Salvar Informações</button>
+                    <button class="btn btn-secondary mb-2" onclick="exportData()">Exportar Dados</button>
+                    <button class="btn btn-info mb-2" onclick="importData()">Importar Backup</button>
+                    <button class="btn btn-success mb-2" onclick="printPage()">Imprimir Página</button>
+                    <button class="btn btn-warning mb-2" onclick="exportPDF()">Exportar em PDF</button>
+                    <button class="btn btn-danger mb-2" onclick="exportXLS()">Exportar em XLS</button>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>Desenvolvido por [dev.daan] © 2024</p>
+                    <p>
+                        <a href="politicas.html">Política de Privacidade</a> |
+                        <a href="termos.html">Termos de Uso</a> |
+                        <a href="contato.html">Contato</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+        let cardSpendingChart, categorySpendingChart, spendingTrendChart;
+
+        function addTransaction(event) {
+            event.preventDefault();
+            const transaction = {
+                id: Date.now(),
+                date: document.getElementById('date').value,
+                card: document.getElementById('card').value,
+                amount: parseFloat(document.getElementById('amount').value),
+                location: document.getElementById('location').value,
+                category: document.getElementById('category').value,
+                status: 'Pendente'
+            };
+            transactions.push(transaction);
+            saveTransactions();
+            updateTransactionTable();
+            updateCharts();
+            updateMonthlyReport();
+            updateTechnicalAnalysis();
+            updateDynamicStatistics();
+            event.target.reset();
+        }
+
+        function addQuickEntry() {
+            const transaction = {
+                id: Date.now(),
+                date: document.getElementById('quickDate').value,
+                description: document.getElementById('quickDescription').value,
+                amount: parseFloat(document.getElementById('quickAmount').value),
+                type: document.getElementById('quickType').value,
+                category: document.getElementById('quickCategory').value,
+                account: document.getElementById('quickAccount').value,
+                paymentMethod: document.getElementById('quickPaymentMethod').value,
+                notes: document.getElementById('quickNotes').value,
+                status: 'Pendente'
+            };
+            transactions.push(transaction);
+            saveTransactions();
+            updateTransactionTable();
+            updateCharts();
+            updateMonthlyReport();
+            updateTechnicalAnalysis();
+            updateDynamicStatistics();
+            $('#quickEntryModal').modal('hide');
+            document.getElementById('quickEntryForm').reset();
+        }
+
+        function saveTransactions() {
+            localStorage.setItem('transactions', JSON.stringify(transactions));
+        }
+
+        function updateTransactionTable() {
+            const table = $('#transactionTable').DataTable();
+            table.clear();
+            transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+            transactions.forEach((transaction) => {
+                table.row.add([
+                    transaction.date,
+                    transaction.card,
+                    `R$ ${transaction.amount.toFixed(2)}`,
+                    transaction.location,
+                    transaction.category,
+                    transaction.status,
+                    `<button class="btn btn-sm btn-warning me-1" onclick="editTransaction(${transaction.id})">Editar</button>
+                     <button class="btn btn-sm btn-danger" onclick="deleteTransaction(${transaction.id})">Excluir</button>`
+                ]);
+            });
+            table.draw();
+        }
+
+        function editTransaction(id) {
+            // Implement edit functionality
+            console.log('Edit transaction:', id);
+        }
+
+        function deleteTransaction(id) {
+            transactions = transactions.filter(t => t.id !== id);
+            saveTransactions();
+            updateTransactionTable();
+            updateCharts();
+            updateMonthlyReport();
+            updateTechnicalAnalysis();
+            updateDynamicStatistics();
+        }
+
+        function updateCharts() {
+            updateCardSpendingChart();
+            updateCategorySpendingChart();
+            updateSpendingTrendChart();
+        }
+
+        function updateCardSpendingChart() {
+            const cardSpending = {};
+            transactions.forEach(transaction => {
+                if (cardSpending[transaction.card]) {
+                    cardSpending[transaction.card] += transaction.amount;
+                } else {
+                    cardSpending[transaction.card] = transaction.amount;
+                }
+            });
+
+            const ctx = document.getElementById('cardSpendingChart').getContext('2d');
+            if (cardSpendingChart) {
+                cardSpendingChart.destroy();
+            }
+            cardSpendingChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: Object.keys(cardSpending),
+                    datasets: [{
+                        data: Object.values(cardSpending),
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+        }
+
+        function updateCategorySpendingChart() {
+            const categorySpending = {};
+            transactions.forEach(transaction => {
+                if (categorySpending[transaction.category]) {
+                    categorySpending[transaction.category] += transaction.amount;
+                } else {
+                    categorySpending[transaction.category] = transaction.amount;
+                }
+            });
+
+            const ctx = document.getElementById('categorySpendingChart').getContext('2d');
+            if (categorySpendingChart) {
+                categorySpendingChart.destroy();
+            }
+            categorySpendingChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(categorySpending),
+                    datasets: [{
+                        label: 'Gastos por Categoria',
+                        data: Object.values(categorySpending),
+                        backgroundColor: '#36A2EB'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateSpendingTrendChart() {
+            const monthlySpending = {};
+            transactions.forEach(transaction => {
+                const date = new Date(transaction.date);
+                const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+                if (monthlySpending[monthYear]) {
+                    monthlySpending[monthYear] += transaction.amount;
+                } else {
+                    monthlySpending[monthYear] = transaction.amount;
+                }
+            });
+
+            const ctx = document.getElementById('spendingTrendChart').getContext('2d');
+            if (spendingTrendChart) {
+                spendingTrendChart.destroy();
+            }
+            spendingTrendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Object.keys(monthlySpending),
+                    datasets: [{
+                        label: 'Evolução de Gastos',
+                        data: Object.values(monthlySpending),
+                        borderColor: '#4BC0C0',
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateMonthlyReport() {
+            const monthlyReport = document.getElementById('monthlyReport');
+            const currentDate = new Date();
+            const currentMonth = currentDate.getMonth();
+            const currentYear = currentDate.getFullYear();
+
+            const monthlyTotal = transactions.reduce((total, transaction) => {
+                const transactionDate = new Date(transaction.date);
+                if (transactionDate.getMonth() === currentMonth && transactionDate.getFullYear() === currentYear) {
+                    return total + transaction.amount;
+                }
+                return total;
+            }, 0);
+
+            monthlyReport.innerHTML = `
+                <p>Total de gastos em ${currentDate.toLocaleString('default', { month: 'long' })} ${currentYear}: R$ ${monthlyTotal.toFixed(2)}</p>
+            `;
+        }
+
+        function updateTechnicalAnalysis() {
+            const technicalAnalysis = document.getElementById('technicalAnalysis');
+            const totalTransactions = transactions.length;
+            const totalAmount = transactions.reduce((sum, t) => sum + t.amount, 0);
+            const averageAmount = totalAmount / totalTransactions;
+
+            technicalAnalysis.innerHTML = `
+                <p>Número total de transações: ${totalTransactions}</p>
+                <p>Valor total das transações: R$ ${totalAmount.toFixed(2)}</p>
+                <p>Valor médio por transação: R$ ${averageAmount.toFixed(2)}</p>
+            `;
+        }
+
+        function updateDynamicStatistics() {
+            const dynamicStatistics = document.getElementById('dynamicStatistics');
+            const categories = [...new Set(transactions.map(t => t.category))];
+            const categoryTotals = categories.map(category => {
+                const total = transactions.filter(t => t.category === category).reduce((sum, t) => sum + t.amount, 0);
+                return { category, total };
+            }).sort((a, b) => b.total - a.total);
+
+            dynamicStatistics.innerHTML = `
+                <p>Categoria com maior gasto: ${categoryTotals[0].category} (R$ ${categoryTotals[0].total.toFixed(2)})</p>
+                <p>Categoria com menor gasto: ${categoryTotals[categoryTotals.length - 1].category} (R$ ${categoryTotals[categoryTotals.length - 1].total.toFixed(2)})</p>
+            `;
+        }
+
+        function saveData() {
+            saveTransactions();
+            alert('Dados salvos com sucesso!');
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(transactions);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            const exportFileDefaultName = 'transactions.json';
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function importData() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(event) {
+                const file = event.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const importedData = JSON.parse(e.target.result);
+                        transactions = importedData;
+                        saveTransactions();
+                        updateTransactionTable();
+                        updateCharts();
+                        updateMonthlyReport();
+                        updateTechnicalAnalysis();
+                        updateDynamicStatistics();
+                        alert('Dados importados com sucesso!');
+                    } catch (error) {
+                        alert('Erro ao importar dados. Verifique o formato do arquivo.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        function exportPDF() {
+            alert('Funcionalidade de exportar para PDF ainda não implementada.');
+        }
+
+        function exportXLS() {
+            alert('Funcionalidade de exportar para XLS ainda não implementada.');
+        }
+
+        $(document).ready(function() {
+            $('#transactionTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json'
+                }
+            });
+            document.getElementById('transactionForm').addEventListener('submit', addTransaction);
+            updateTransactionTable();
+            updateCharts();
+            updateMonthlyReport();
+            updateTechnicalAnalysis();
+            updateDynamicStatistics();
+        });
+    </script>
+</body>
+</html>

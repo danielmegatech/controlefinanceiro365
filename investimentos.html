@@ -1,0 +1,558 @@
+<html>
+    <head>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingWebSim - Painel de Negociação GPT Multi-Timeframe Avançado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <!--CASCADING STYLE SHEETS-->  
+  <styles><link rel="stylesheet" href="styles.css"></styles>
+  <!--CASCADING SCRIPTS-->  
+ <script src="script.js" defer></script>
+
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+   <link href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+   </head>
+<body>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+        }
+        .container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) 350px;
+            grid-template-rows: auto repeat(2, 1fr);
+            height: 100vh;
+            gap: 15px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+        .header {
+            grid-column: 1 / -1;
+            background-color: #2962ff;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .chart-container {
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .chart-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .chart-header {
+            background-color: #3c3c3c;
+            padding: 10px 15px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #e0e0e0;
+            border-bottom: 1px solid #4c4c4c;
+        }
+        .sidebar {
+            grid-row: 2 / span 2;
+            grid-column: 4;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            overflow-y: auto;
+        }
+        .widget {
+            background-color: #2c2c2c;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            transition: all 0.3s ease;
+        }
+        .widget:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+        .btn {
+            padding: 10px 15px;
+            background-color: #2962ff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #1e4bd8;
+        }
+        #gpt-query {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: #3c3c3c;
+            color: #e0e0e0;
+        }
+        #gpt-response {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #3c3c3c;
+            border-radius: 5px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .relevant-data {
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .relevant-data strong {
+            color: #2962ff;
+        }
+        #symbol-selector {
+            padding: 10px;
+            font-size: 16px;
+            background-color: #3c3c3c;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1c1c1c;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3c3c3c;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4c4c4c;
+        }
+       
+
+   
+    </style>
+    <!-- Header -->
+      <!-- criado e desenvolvido por daan.dev, dedicado a radige que me apoia e incentiva a ser uma pessoa melhor. -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="index.html">Controle Financeiro</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="index.html">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="controle.html">Controle Financeiro</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="dividas.html">Controle de Dívidas</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="cartoes.html">Cartões de Crédito</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="investimentos.html">Investimentos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="patrimonio.html">Patrimônio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="veiculo.html">Veículos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="configuracoes.html">Configurações</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>Painel de Negociação GPT Multi-Timeframe Avançado</h1>
+            <select id="symbol-selector">
+                <option value="BTCBRL">BTC/BRL</option>
+                <option value="ETHBRL">ETH/BRL</option>
+                <option value="XRPBRL">XRP/BRL</option>
+                <option value="ADABRL">ADA/BRL</option>
+                <option value="DOTBRL">DOT/BRL</option>
+                <option value="LINKBRL">LINK/BRL</option>
+                <option value="UNIBRL">UNI/BRL</option>
+                <option value="EURBRL">EUR/BRL</option>
+                <option value="GBPBRL">GBP/BRL</option>
+                <option value="JPYBRL">JPY/BRL</option>
+                <option value="CADBRL">CAD/BRL</option>
+                <option value="AUDBRL">AUD/BRL</option>
+                <option value="NZDBRL">NZD/BRL</option>
+                <option value="CHFBRL">CHF/BRL</option>
+                <option value="AAPL">AAPL</option>
+                <option value="GOOGL">GOOGL</option>
+                <option value="MSFT">MSFT</option>
+                <option value="AMZN">AMZN</option>
+                <option value="TSLA">TSLA</option>
+                <option value="FB">FB</option>
+                <option value="NVDA">NVDA</option>
+                <option value="NFLX">NFLX</option>
+                <option value="JPM">JPM</option>
+                <option value="V">V</option>
+                <option value="SPY">SPY</option>
+                <option value="MNQ1!">MNQ1!</option>
+                <option value="SOUN">SOUN</option>
+                <option value="ASML">ASML</option>
+                <option value="USDBRL">USD/BRL</option>
+                <option value="ARSBRL">ARS/BRL</option>
+                <option value="CNYBRL">CNY/BRL</option>
+                <option value="MXNBRL">MXN/BRL</option>
+                <option value="USDTBRL">USDT/BRL</option>
+                <option value="LTCBRL">LTC/BRL</option>
+                <option value="BNBBRL">BNB/BRL</option>
+                <option value="SOLBRL">SOL/BRL</option>
+                <option value="USDCBRL">USDC/BRL</option>
+                <option value="DOGEBRL">DOGE/BRL</option>
+                <option value="TONBRL">TON/BRL</option>
+            </select>
+        </header>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 1 Minuto</div>
+            <div id="chart1"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 15 Minutos</div>
+            <div id="chart2"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 1 Hora</div>
+            <div id="chart3"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 4 Horas</div>
+            <div id="chart4"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 1 Dia</div>
+            <div id="chart5"></div>
+        </div>
+        <div class="chart-container">
+            <div class="chart-header">BTCBRL - 1 Semana</div>
+            <div id="chart6"></div>
+        </div>
+        <aside class="sidebar">
+            <div class="widget">
+                <h3>Dados Relevantes do Instrumento</h3>
+                <div id="relevant-data"></div>
+            </div>
+            <div class="widget">
+                <h3>Assistente de Negociação GPT</h3>
+                <input type="text" id="gpt-query" placeholder="Pergunte sobre negociação...">
+                <button class="btn" id="ask-gpt">Perguntar ao GPT</button>
+                <div id="gpt-response"></div>
+            </div>
+        </aside>
+    </div>
+
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script type="text/javascript">
+    let simboloAtual = "BTCBRL";
+    const timeframes = ["1", "15", "60", "240", "D", "W"];
+    const nomesDosTimeframes = ["1 Minuto", "15 Minutos", "1 Hora", "4 Horas", "1 Dia", "1 Semana"];
+    
+    function criarWidgetTradingView(idDoContainer, simbolo, intervalo, nomeDoTimeframe) {
+        new TradingView.widget({
+            "width": "100%",
+            "height": "100%",
+            "symbol": simbolo,
+            "interval": intervalo,
+            "timezone": "Etc/UTC",
+            "theme": "dark",
+            "style": "1",
+            "locale": "pt",
+            "toolbar_bg": "#2c2c2c",
+            "enable_publishing": false,
+            "hide_top_toolbar": true,
+            "hide_legend": false,
+            "save_image": false,
+            "container_id": idDoContainer,
+            "studies": [
+                { id: "RSI@tv-basicstudies", name: "RSI" },
+                { id: "MACD@tv-basicstudies", name: "MACD" },
+                { id: "BB@tv-basicstudies", name: "Bollinger Bands" }
+            ],
+            "studies_overrides": {
+                "rsi.rsi.color": "#2962FF",
+                "rsi.rsi.linewidth": 2,
+                "macd.macd.color": "#2962FF",
+                "macd.signal.color": "#FF6D00",
+                "macd.histogram.color": "#26A69A"
+            },
+            "overrides": {
+                "paneProperties.background": "#2c2c2c",
+                "paneProperties.vertGridProperties.color": "#3c3c3c",
+                "paneProperties.horzGridProperties.color": "#3c3c3c",
+                "symbolWatermarkProperties.transparency": 90,
+                "scalesProperties.textColor": "#e0e0e0",
+                "mainSeriesProperties.candleStyle.upColor": "#26A69A",
+                "mainSeriesProperties.candleStyle.downColor": "#EF5350",
+                "mainSeriesProperties.candleStyle.drawWick": true,
+                "mainSeriesProperties.candleStyle.drawBorder": true,
+                "mainSeriesProperties.candleStyle.borderUpColor": "#26A69A",
+                "mainSeriesProperties.candleStyle.borderDownColor": "#EF5350",
+                "mainSeriesProperties.candleStyle.wickUpColor": "#26A69A",
+                "mainSeriesProperties.candleStyle.wickDownColor": "#EF5350"
+            }
+        });
+        document.querySelector(`#${idDoContainer}`).closest('.chart-container').querySelector('.chart-header').textContent = `${simbolo} - ${nomeDoTimeframe}`;
+    }
+
+    function atualizarGraficos(simbolo) {
+        for (let i = 0; i < 6; i++) {
+            criarWidgetTradingView(`chart${i+1}`, simbolo, timeframes[i], nomesDosTimeframes[i]);
+        }
+        atualizarDadosRelevantes(simbolo);
+    }
+
+    function atualizarDadosRelevantes(simbolo) {
+        const relevantDataDiv = document.getElementById('relevant-data');
+        let relevantData = '';
+        const status = ['Compra Forte', 'Compra', 'Venda Forte', 'Venda'][Math.floor(Math.random() * 4)];
+
+        switch(simbolo) {
+            case 'BTCBRL':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>ETH/BRL:</strong> <span>R$18,500 (+2.1%)</span></div>
+                    <div class="relevant-data"><strong>Capitalização Total do Mercado Cripto:</strong> <span>R$10.9T</span></div>
+                    <div class="relevant-data"><strong>Domínio do BTC:</strong> <span>42.5%</span></div>
+                    <div class="relevant-data"><strong>Índice de Medo e Ganância:</strong> <span>65 (Ganância)</span></div>
+                    <div class="relevant-data"><strong>Volume em 24h:</strong> <span>R$230B</span></div>
+                    <div class="relevant-data"><strong>Interesse em Aberto:</strong> <span>R$115B</span></div>
+                    <div class="relevant-data"><strong>Taxa de Hash:</strong> <span>180 EH/s</span></div>
+                    <div class="relevant-data"><strong>Endereços Ativos:</strong> <span>1.2M</span></div>
+                    <div class="relevant-data"><strong>Tamanho do Mempool:</strong> <span>15,000 transações</span></div>
+                    <div class="relevant-data"><strong>Capacidade da Lightning Network:</strong> <span>3,500 BTC</span></div>
+                    <div class="relevant-data"><strong>Próximo Halving:</strong> <span>~2 anos</span></div>
+                    <div class="relevant-data"><strong>Relação MVRV:</strong> <span>2.8</span></div>
+                `;
+                break;
+            case 'ETHBRL':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>BTC/BRL:</strong> <span>R$55,230 (-1.2%)</span></div>
+                    <div class="relevant-data"><strong>Preço do Gás (Gwei):</strong> <span>45</span></div>
+                    <div class="relevant-data"><strong>ETH Empenhado:</strong> <span>12.5M</span></div>
+                    <div class="relevant-data"><strong>TVL do DeFi:</strong> <span>R$448B</span></div>
+                    <div class="relevant-data"><strong>Volume em 24h:</strong> <span>R$100B</span></div>
+                    <div class="relevant-data"><strong>Relação ETH/BTC:</strong> <span>0.0624</span></div>
+                    <div class="relevant-data"><strong>Endereços Ativos:</strong> <span>650,000</span></div>
+                    <div class="relevant-data"><strong>Transações Diárias:</strong> <span>1.2M</span></div>
+                    <div class="relevant-data"><strong>Valor Total Empenhado em ETH 2.0:</strong> <span>R$160B</span></div>
+                    <div class="relevant-data"><strong>ETH Queimados (24h):</strong> <span>12,500 ETH</span></div>
+                    <div class="relevant-data"><strong>Utilização da Rede:</strong> <span>98%</span></div>
+                    <div class="relevant-data"><strong>Endereços Únicos:</strong> <span>172M</span></div>
+                `;
+                break;
+            case 'EURBRL':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>Índice do USD:</strong> <span>491.25 (-0.3%)</span></div>
+                    <div class="relevant-data"><strong>EUR/GBP:</strong> <span>0.8650 (+0.1%)</span></div>
+                    <div class="relevant-data"><strong>EUR/JPY:</strong> <span>130.45 (+0.2%)</span></div>
+                    <div class="relevant-data"><strong>Taxa de Juros de 10 Anos da Alemanha:</strong> <span>-0.25%</span></div>
+                    <div class="relevant-data"><strong>Taxa de Juros de 10 Anos dos EUA:</strong> <span>1.65%</span></div>
+                    <div class="relevant-data"><strong>Taxa de Depósito do BCE:</strong> <span>-0.50%</span></div>
+                    <div class="relevant-data"><strong>Taxa de Inflação da UE:</strong> <span>1.9%</span></div>
+                    <div class="relevant-data"><strong>Taxa de Desemprego da UE:</strong> <span>7.9%</span></div>
+                    <div class="relevant-data"><strong>Taxa de Crescimento do PIB da UE:</strong> <span>2.0%</span></div>
+                    <div class="relevant-data"><strong>PMI de Fabricação da UE:</strong> <span>62.5</span></div>
+                    <div class="relevant-data"><strong>PMI de Serviços da UE:</strong> <span>55.1</span></div>
+                    <div class="relevant-data"><strong>Confiança do Consumidor da UE:</strong> <span>-6.1</span></div>
+                `;
+                break;
+            case 'AAPL':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>NASDAQ:</strong> <span>14,020.30 (+0.7%)</span></div>
+                    <div class="relevant-data"><strong>S&P 500:</strong> <span>4,185.25 (+0.5%)</span></div>
+                    <div class="relevant-data"><strong>VIX:</strong> <span>16.25 (-3.2%)</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>28.5</span></div>
+                    <div class="relevant-data"><strong>Rendimento de Dividendos:</strong> <span>0.67%</span></div>
+                    <div class="relevant-data"><strong>Capitalização de Mercado:</strong> <span>R$12.7T</span></div>
+                    <div class="relevant-data"><strong>Máxima de 52 Semanas:</strong> <span>R$745.09</span></div>
+                    <div class="relevant-data"><strong>Mínima de 52 Semanas:</strong> <span>R$374.72</span></div>
+                    <div class="relevant-data"><strong>Crescimento de Receita Ano-Ano:</strong> <span>21.4%</span></div>
+                    <div class="relevant-data"><strong>Participação de Mercado do iPhone:</strong> <span>23.4%</span></div>
+                    <div class="relevant-data"><strong>Receita de Serviços:</strong> <span>R$85.9B</span></div>
+                    <div class="relevant-data"><strong>Dinheiro em Caixa:</strong> <span>R$1.02T</span></div>
+                `;
+                break;
+            case 'GOOGL':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>NASDAQ:</strong> <span>14,020.30 (+0.7%)</span></div>
+                    <div class="relevant-data"><strong>S&P 500:</strong> <span>4,185.25 (+0.5%)</span></div>
+                    <div class="relevant-data"><strong>VIX:</strong> <span>16.25 (-3.2%)</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>35.2</span></div>
+                    <div class="relevant-data"><strong>Crescimento de Receita Ano-Ano:</strong> <span>23.5%</span></div>
+                    <div class="relevant-data"><strong>Capitalização de Mercado:</strong> <span>R$8.7T</span></div>
+                    <div class="relevant-data"><strong>Participação de Mercado de Busca:</strong> <span>92.5%</span></div>
+                    <div class="relevant-data"><strong>Receita de Anúncios do YouTube:</strong> <span>R$34.9B</span></div>
+                    <div class="relevant-data"><strong>Crescimento da Receita em Nuvem:</strong> <span>46%</span></div>
+                    <div class="relevant-data"><strong>Patentes de IA Registradas (2020):</strong> <span>2,589</span></div>
+                    <div class="relevant-data"><strong>Custos de Aquisição de Tráfego:</strong> <span>R$45.7B</span></div>
+                    <div class="relevant-data"><strong>Despesas de P&D:</strong> <span>R$37.5B</span></div>
+                `;
+                break;
+            case 'TSLA':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>NASDAQ:</strong> <span>14,020.30 (+0.7%)</span></div>
+                    <div class="relevant-data"><strong>S&P 500:</strong> <span>4,185.25 (+0.5%)</span></div>
+                    <div class="relevant-data"><strong>VIX:</strong> <span>16.25 (-3.2%)</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>1,150</span></div>
+                    <div class="relevant-data"><strong>Desempenho do Setor EV:</strong> <span>+2.8%</span></div>
+                    <div class="relevant-data"><strong>Capitalização de Mercado:</strong> <span>R$30.5B</span></div>
+                    <div class="relevant-data"><strong>Entregas Trimestrais:</strong> <span>184,800</span></div>
+                    <div class="relevant-data"><strong>Capacidade de Produção:</strong> <span>1.05M/ano</span></div>
+                    <div class="relevant-data"><strong>Implantações de Armazenamento de Energia:</strong> <span>3,022 MWh</span></div>
+                    <div class="relevant-data"><strong>Estações Supercharger:</strong> <span>2,710</span></div>
+                    <div class="relevant-data"><strong>Margem Bruta Automotiva:</strong> <span>26.5%</span></div>
+                    <div class="relevant-data"><strong>Testes Beta de FSD:</strong> <span>~2,000</span></div>
+                `;
+                break;
+            case 'SPY':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>S&P 500:</strong> <span>4,185.25 (+0.5%)</span></div>
+                    <div class="relevant-data"><strong>VIX:</strong> <span>16.25 (-3.2%)</span></div>
+                    <div class="relevant-data"><strong>Rendimento de Dividendos:</strong> <span>1.35%</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>27.5</span></div>
+                    <div class="relevant-data"><strong>AUM:</strong> <span>R$2.1T</span></div>
+                    <div class="relevant-data"><strong>Desempenho YTD:</strong> <span>+11.2%</span></div>
+                    <div class="relevant-data"><strong>Composições Setoriais:</strong> <span>Tech 27%, Saúde 13%, Finanças 11%</span></div>
+                    <div class="relevant-data"><strong>Beta:</strong> <span>1.0</span></div>
+                    <div class="relevant-data"><strong>Máxima de 52 Semanas:</strong> <span>R$2,000.00</span></div>
+                    <div class="relevant-data"><strong>Mínima de 52 Semanas:</strong> <span>R$1,000.00</span></div>
+                    <div class="relevant-data"><strong>Volume Médio:</strong> <span>75M</span></div>
+                    <div class="relevant-data"><strong>Taxa de Despesas Líquidas:</strong> <span>0.09%</span></div>
+                `;
+                break;
+            case 'MNQ1!':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>NASDAQ-100:</strong> <span>14,020.30 (+0.7%)</span></div>
+                    <div class="relevant-data"><strong>VXN:</strong> <span>22.5 (-1.8%)</span></div>
+                    <div class="relevant-data"><strong>Tamanho do Tick:</strong> <span>0.25</span></div>
+                    <div class="relevant-data"><strong>Valor do Ponto:</strong> <span>R$10</span></div>
+                    <div class="relevant-data"><strong>Margem Inicial:</strong> <span>R$4,900</span></div>
+                    <div class="relevant-data"><strong>Margem de Manutenção:</strong> <span>R$4,500</span></div>
+                    <div class="relevant-data"><strong>Liquidação:</strong> <span>Liquidado em Dinheiro</span></div>
+                    <div class="relevant-data"><strong>Horas de Negociação:</strong> <span>23 horas/dia, 5 dias/semana</span></div>
+                    <div class="relevant-data"><strong>Desempenho YTD:</strong> <span>+8.7%</span></div>
+                    <div class="relevant-data"><strong>Principais Componentes:</strong> <span>AAPL, MSFT, AMZN, GOOGL, FB</span></div>
+                    <div class="relevant-data"><strong>Volume Médio Diário:</strong> <span>410,000 contratos</span></div>
+                    <div class="relevant-data"><strong>Correlação com E-mini S&P 500:</strong> <span>0.95</span></div>
+                `;
+                break;
+            case 'SOUN':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>Capitalização de Mercado:</strong> <span>R$680M</span></div>
+                    <div class="relevant-data"><strong>Faixa de 52 Semanas:</strong> <span>R$3.00 - R$26.00</span></div>
+                    <div class="relevant-data"><strong>Volume Médio:</strong> <span>15M</span></div>
+                    <div class="relevant-data"><strong>Beta:</strong> <span>1.85</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>N/A (Não Lucrou)</span></div>
+                    <div class="relevant-data"><strong>Receita (TTM):</strong> <span>R$31.13M</span></div>
+                    <div class="relevant-data"><strong>Dinheiro em Caixa:</strong> <span>R$125M</span></div>
+                    <div class="relevant-data"><strong>Interesse Curto:</strong> <span>12.5%</span></div>
+                    <div class="relevant-data"><strong>Propriedade Institucional:</strong> <span>18.7%</span></div>
+                    <div class="relevant-data"><strong>Consenso de Analistas:</strong> <span>Manter</span></div>
+                    <div class="relevant-data"><strong>Últimas Notícias:</strong> <span>Parceria com a Microsoft anunciada</span></div>
+                    <div class="relevant-data"><strong>Indústria:</strong> <span>Software - Aplicação</span></div>
+                `;
+                break;
+            case 'ASML':
+                relevantData = `
+                    <div class="relevant-data"><strong>Status:</strong> <span>${status}</span></div>
+                    <div class="relevant-data"><strong>Capitalização de Mercado:</strong> <span>€240B</span></div>
+                    <div class="relevant-data"><strong>Relação P/E:</strong> <span>36.5</span></div>
+                    <div class="relevant-data"><strong>Rendimento de Dividendos:</strong> <span>0.9%</span></div>
+                    <div class="relevant-data"><strong>Receita (TTM):</strong> <span>€18.6B</span></div>
+                    <div class="relevant-data"><strong>Rendimento Líquido (TTM):</strong> <span>€5.8B</span></div>
+                    <div class="relevant-data"><strong>Backlog de Sistemas EUV:</strong> <span>€19.2B</span></div>
+                    <div class="relevant-data"><strong>Despesas de P&D:</strong> <span>€2.2B</span></div>
+                    <div class="relevant-data"><strong>Margem Bruta:</strong> <span>52.3%</span></div>
+                    <div class="relevant-data"><strong>Participação de Mercado em Litografia:</strong> <span>~90%</span></div>
+                    <div class="relevant-data"><strong>Crescimento de Receita Ano-a-Ano:</strong> <span>18.3%</span></div>
+                    <div class="relevant-data"><strong>Dinheiro em Caixa:</strong> <span>€4.7B</span></div>
+                    <div class="relevant-data"><strong>Número de Funcionários:</strong> <span>~31,000</span></div>
+                `;
+                break;
+            default:
+                relevantData = `<div class="relevant-data">Não há dados específicos disponíveis para ${simbolo}. Por favor, selecione outro instrumento.</div>`;
+        }
+        relevantDataDiv.innerHTML = relevantData;
+    }
+
+    atualizarGraficos(simboloAtual);
+
+    document.getElementById('symbol-selector').addEventListener('change', function() {
+        simboloAtual = this.value;
+        atualizarGraficos(simboloAtual);
+    });
+
+    document.getElementById('ask-gpt').addEventListener('click', function() {
+        const query = document.getElementById('gpt-query').value;
+        const responseDiv = document.getElementById('gpt-response');
+        responseDiv.innerHTML = '<p>Analisando divergências de RSI e condições de mercado...</p>';
+        
+        setTimeout(() => {
+            const gptResponses = [
+                `Baseado na análise de divergência RSI multi-timeframe para ${simboloAtual}, estamos vendo sinais conflitantes. Os gráficos de 15 minutos e semanal mostram divergências de alta, enquanto os gráficos horário e diário exibem tendências de baixa. Esta estrutura complexa sugere possíveis reversões em diferentes escalas de tempo. Considere estas divergências para o tempo de entrada e saída, mas fique atento às tendências maiores. As condições atuais de mercado também indicam ${Math.random() > 0.5 ? 'aumento da volatilidade' : 'negociação em faixa'}, o que pode afetar a execução da sua estratégia.`,
+                `Para ${simboloAtual}, há uma forte divergência de baixa no gráfico de 1 hora, juntamente com uma possível divergência oculta de alta formando no gráfico semanal. Este padrão normalmente indica uma correção de curto prazo dentro de uma tendência maior de alta, oferecendo boas oportunidades de compra. No entanto, dada a ${Math.random() > 0.5 ? 'alta' : 'baixa'} volume de negociação e ${Math.random() > 0.5 ? 'sentimento de alta' : 'sentimento de baixa'} no mercado geral, é crucial buscar confirmação da ação do preço no gráfico de 15 minutos antes de entrar em negociações.`,
+                `A divergência de RSI de longo prazo no gráfico diário para ${simboloAtual} é um sinal significativo de advertência para compradores. No entanto, a divergência de alta formando no gráfico de 15 minutos sugere um possível movimento ascendente de curto prazo. Este conflito entre os timeframes muitas vezes leva a uma maior volatilidade. Dadas as condições atuais de mercado, incluindo ${Math.random() > 0.5 ? 'aumento das taxas de juros' : 'queda das taxas de juros'} e ${Math.random() > 0.5 ? 'indicadores econômicos positivos' : 'indicadores econômicos negativos'}, considere usar estratégias de opções para capitalizar em possíveis grandes oscilações de preço.`,
+                `Para ${simboloAtual}, a falta de divergências claras de RSI nos gráficos de 1 minuto e 4 horas, combinada com sinais conflitantes em outros timeframes, sugere um mercado em equilíbrio. Isso geralmente precede um movimento significativo. A atual ${Math.random() > 0.5 ? 'alta' : 'baixa'} atividade comercial institucional e o ${Math.random() > 0.5 ? 'sentimento de alta' : 'sentimento de baixa'} dos traders de varejo apoiam ainda mais essa visão. Monitore o volume em diferentes timeframes para sinais de rompimento, e esteja preparado para uma volatilidade aumentada.`,
+                `A análise de divergência RSI multi-timeframe para ${simboloAtual} destaca a natureza fractal dos mercados. A divergência de baixa no gráfico de 1 hora é espelhada pelo gráfico diário, enquanto as divergências de alta aparecem nos gráficos de 15 minutos e semanal. Este padrão sugere que a estrutura de mercado atual está se repetindo em diferentes timeframes. Dadas as recentes ${Math.random() > 0.5 ? 'notícias positivas' : 'notícias negativas'} sobre ${simboloAtual} e o ${Math.random() > 0.5 ? 'sentimento de alta' : 'sentimento de baixa'} no mercado geral, fique atento à harmonização dessas divergências como um possível gatilho para um forte movimento direcional.`
+            ];
+            const randomResponse = gptResponses[Math.floor(Math.random() * gptResponses.length)];
+            responseDiv.innerHTML = `<p><strong>Assistente GPT:</strong> ${randomResponse}</p>`;
+        }, 2000);
+    });
+    </script>
+     <!-- Novo Rodapé -->
+     <footer class="footer" id="footer">
+        <div class="footer-links">
+            <a href="politicas.html">Política de Privacidade</a>
+            <a href="termos.html">Termos de Uso</a>
+            <a href="contato.html">Contato</a>
+        </div>
+        <div class="footer-social">
+            <a href="#" class="me-3"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="me-3"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p class="mt-3">Desenvolvido por [dev.daan] © 2024</p>
+    </footer>
+</body>
+</html>

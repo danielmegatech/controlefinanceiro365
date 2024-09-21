@@ -1,0 +1,699 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle Financeiro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        body.dark-mode {
+            background-color: #333;
+            color: #fff;
+        }
+        body.dark-mode .bg-light {
+            background-color: #444 !important;
+        }
+        body.dark-mode .bg-primary {
+            background-color: #007bff !important;
+        }
+        body.dark-mode .table {
+            color: #fff;
+        }
+        .tip-box {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        body.dark-mode .tip-box {
+            background-color: #444;
+            border-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-primary text-white py-3">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1>Controle Financeiro</h1>
+                </div>
+                <div class="col-md-6">
+                    <nav class="navbar navbar-expand-lg navbar-dark">
+                        <ul class="navbar-nav ml-auto">
+                            <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
+                            <li class="nav-item"><a class="nav-link" href="controle.html">Controle</a></li>
+                            <li class="nav-item"><a class="nav-link" href="dividas.html">Dívidas</a></li>
+                            <li class="nav-item"><a class="nav-link" href="cartoes.html">Cartões</a></li>
+                            <li class="nav-item"><a class="nav-link" href="investimentos.html">Investimentos</a></li>
+                            <li class="nav-item"><a class="nav-link" href="patrimonio.html">Patrimônio</a></li>
+                            <li class="nav-item"><a class="nav-link" href="veiculo.html">Veículo</a></li>
+                            <li class="nav-item"><a class="nav-link" href="configuracoes.html">Configurações</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>Lista de Entradas</h2>
+            <button id="toggleDarkMode" class="btn btn-outline-primary">
+                <i class="fas fa-moon"></i> Modo Escuro
+            </button>
+        </div>
+
+        <div class="tip-box mb-4">
+            <h3>Dica do Dia</h3>
+            <p id="dailyTip">Carregando dica...</p>
+        </div>
+
+        <section id="entries-list">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Valor</th>
+                        <th>Tipo</th>
+                        <th>Conta</th>
+                        <th>Forma de Pagamento</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="entries-table-body">
+                    <!-- Entries will be dynamically added here -->
+                </tbody>
+            </table>
+            <div class="row">
+                <div class="col-md-4">
+                    <p>Total de Despesas: <span id="total-expenses">R$ 0,00</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Total de Receitas: <span id="total-income">R$ 0,00</span></p>
+                </div>
+                <div class="col-md-4">
+                    <p>Saldo: <span id="balance">R$ 0,00</span></p>
+                </div>
+            </div>
+        </section>
+
+        <section id="analysis" class="mt-5">
+            <h2>Análises e Estatísticas</h2>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h3>Saldo ao Longo do Tempo</h3>
+                    <div class="chart-container">
+                        <canvas id="balance-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Distribuição de Receitas</h3>
+                    <div class="chart-container">
+                        <canvas id="income-distribution-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Distribuição de Despesas</h3>
+                    <div class="chart-container">
+                        <canvas id="expense-distribution-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Receitas Mensais</h3>
+                    <div class="chart-container">
+                        <canvas id="monthly-income-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Despesas Mensais</h3>
+                    <div class="chart-container">
+                        <canvas id="monthly-expenses-chart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h3>Fluxo de Caixa: Despesas x Receitas</h3>
+                    <div class="chart-container">
+                        <canvas id="cash-flow-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-light text-center py-3 mt-5">
+        <div class="container">
+            <div class="row mb-3">
+                <div class="col">
+                    <button class="btn btn-outline-primary me-2" onclick="saveData()">Salvar Informações</button>
+                    <button class="btn btn-outline-secondary me-2" onclick="exportData()">Exportar Dados</button>
+                    <button class="btn btn-outline-info me-2" onclick="importBackup()">Importar Backup</button>
+                    <button class="btn btn-outline-success me-2" onclick="printPage()">Imprimir Página</button>
+                    <button class="btn btn-outline-warning me-2" onclick="exportPDF()">Exportar em PDF</button>
+                    <button class="btn btn-outline-danger" onclick="exportXLS()">Exportar em XLS</button>
+                </div>
+            </div>
+            <p>Desenvolvido por [dev.daan] © 2024</p>
+            <p>
+                <a href="politicas.html">Política de Privacidade</a> |
+                <a href="termos.html">Termos de Uso</a> |
+                <a href="contato.html">Contato</a>
+            </p>
+        </div>
+    </footer>
+
+    <button class="btn btn-primary btn-lg rounded-circle floating-button" data-bs-toggle="modal" data-bs-target="#addEntryModal">
+        <i class="fas fa-plus"></i>
+    </button>
+
+    <!-- Modal for adding new entry -->
+    <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addEntryModalLabel">Adicionar Entrada</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addEntryForm">
+                        <div class="mb-3">
+                            <label for="entryDate" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="entryDate" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryDescription" class="form-label">Descrição</label>
+                            <input type="text" class="form-control" id="entryDescription" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryCategory" class="form-label">Categoria</label>
+                            <select class="form-select" id="entryCategory" required>
+                                <option value="">Selecione uma categoria</option>
+                                <optgroup label="Despesas">
+                                    <option value="moradia">🏠 Moradia</option>
+                                    <option value="compras">🛒 Compras</option>
+                                    <option value="restaurantes">🍽️ Restaurantes</option>
+                                    <option value="viagens">✈️ Viagens</option>
+                                    <option value="saude">🏥 Saúde</option>
+                                    <option value="transporte">🚍 Transporte</option>
+                                    <option value="cursos">📚 Cursos</option>
+                                    <option value="jogos">🎮 Jogos</option>
+                                    <option value="presentes">🎁 Presentes</option>
+                                    <option value="diversao">🎉 Diversão</option>
+                                    <option value="outros">🔄 Outros</option>
+                                    <option value="cartao-credito">💳 Cartão de Crédito</option>
+                                    <option value="plano-celular">📱 Plano de Celular</option>
+                                    <option value="faculdade">🎓 Faculdade</option>
+                                    <option value="barbeiro">💈 Barbeiro</option>
+                                    <option value="salao-beleza">💅 Salão de Beleza</option>
+                                    <option value="spotify">🎵 Spotify</option>
+                                    <option value="consorcio">🤝 Consórcio</option>
+                                    <option value="streaming">🎬 Streaming</option>
+                                    <option value="juridico">⚖️ Jurídico</option>
+                                    <option value="banco">🏦 Banco</option>
+                                </optgroup>
+                                <optgroup label="Receitas">
+                                    <option value="salario">💰 Salário</option>
+                                    <option value="uber">🚖 Uber</option>
+                                    <option value="ferias">🌴 Férias</option>
+                                    <option value="fgts">🏢 FGTS</option>
+                                    <option value="pis">📈 PIS</option>
+                                    <option value="lucros">💹 Lucros</option>
+                                    <option value="servicos">💻 Serviços</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryAmount" class="form-label">Valor</label>
+                            <input type="number" class="form-control" id="entryAmount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryType" class="form-label">Tipo</label>
+                            <select class="form-select" id="entryType" required>
+                                <option value="expense">⤵️ Despesa</option>
+                                <option value="income">✅ Receita</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryAccount" class="form-label">Conta</label>
+                            <select class="form-select" id="entryAccount" required>
+                                <option value="banco-principal">💳 Banco Principal</option>
+                                <option value="banco-secundario">💳 Banco Secundário</option>
+                                <option value="banco-alternativo1">💳 Banco Alternativo1</option>
+                                <option value="banco-alternativo2">💳 Banco Alternativo2</option>
+                                <option value="cartao-credito-parcelado">💳 Cartão de Crédito Parcelado</option>
+                                <option value="conta-salario">🏦 Conta Salário</option>
+                                <option value="conta-internacional-wise">🌍 Conta Internacional Wise</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="entryPaymentMethod" class="form-label">Forma de Pagamento</label>
+                            <select class="form-select" id="entryPaymentMethod" required>
+                                <option value="cartao-credito">💳 Cartão de Crédito</option>
+                                <option value="cartao-debito">💳 Cartão de Débito</option>
+                                <option value="pix">⚡ Pix</option>
+                                <option value="dinheiro">💵 Dinheiro</option>
+                                <option value="cheque">🧾 Cheque</option>
+                                <option value="deposito-bancario">🏦 Depósito Bancário</option>
+                                <option value="criptomoedas">₿ Criptomoedas</option>
+                                <option value="troca">🔄 Troca</option>
+                                <option value="boleto">🧾 Boleto</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveEntryBtn">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data for demonstration
+        let sampleData = [
+            { date: '2023-05-01', description: 'Salário', category: '💰 Salário', amount: 5000, type: 'income', account: '💳 Banco Principal', paymentMethod: '🏦 Depósito Bancário' },
+            { date: '2023-05-05', description: 'Aluguel', category: '🏠 Moradia', amount: 1500, type: 'expense', account: '💳 Banco Principal', paymentMethod: '⚡ Pix' },
+            { date: '2023-05-10', description: 'Supermercado', category: '🛒 Compras', amount: 500, type: 'expense', account: '💳 Cartão de Crédito Parcelado', paymentMethod: '💳 Cartão de Crédito' },
+            { date: '2023-05-15', description: 'Freelance', category: '💻 Serviços', amount: 1000, type: 'income', account: '🌍 Conta Internacional Wise', paymentMethod: '🏦 Depósito Bancário' },
+        ];
+
+        // Function to format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+        }
+
+        // Function to update the entries table
+        function updateEntriesTable() {
+            const tableBody = document.getElementById('entries-table-body');
+            tableBody.innerHTML = '';
+
+            let totalExpenses = 0;
+            let totalIncome = 0;
+
+            sampleData.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${entry.date}</td>
+                    <td>${entry.description}</td>
+                    <td>${entry.category}</td>
+                    <td>${formatCurrency(entry.amount)}</td>
+                    <td>${entry.type === 'income' ? '✅ Receita' : '⤵️ Despesa'}</td>
+                    <td>${entry.account}</td>
+                    <td>${entry.paymentMethod}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEntry(${index})">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEntry(${index})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+
+                if (entry.type === 'income') {
+                    totalIncome += entry.amount;
+                } else {
+                    totalExpenses += entry.amount;
+                }
+            });
+
+            document.getElementById('total-expenses').textContent = formatCurrency(totalExpenses);
+            document.getElementById('total-income').textContent = formatCurrency(totalIncome);
+            document.getElementById('balance').textContent = formatCurrency(totalIncome - totalExpenses);
+        }
+
+        // Function to add a new entry
+        function addEntry(entry) {
+            sampleData.push(entry);
+            updateEntriesTable();
+            updateCharts();
+        }
+
+        // Function to edit an entry (placeholder)
+        function editEntry(index) {
+            console.log('Edit entry:', index);
+            // Implement edit functionality
+        }
+
+        // Function to delete an entry
+        function deleteEntry(index) {
+            sampleData.splice(index, 1);
+            updateEntriesTable();
+            updateCharts();
+        }
+
+        // Function to update all charts
+        function updateCharts() {
+            updateBalanceChart();
+            updateIncomeDistributionChart();
+            updateExpenseDistributionChart();
+            updateMonthlyIncomeChart();
+            updateMonthlyExpensesChart();
+            updateCashFlowChart();
+        }
+
+        // Function to update the balance chart
+        function updateBalanceChart() {
+            const ctx = document.getElementById('balance-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sampleData.map(entry => entry.date),
+                    datasets: [{
+                        label: 'Saldo',
+                        data: sampleData.map(entry => entry.type === 'income' ? entry.amount : -entry.amount),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update the income distribution chart
+        function updateIncomeDistributionChart() {
+            const ctx = document.getElementById('income-distribution-chart').getContext('2d');
+            const incomeData = sampleData.filter(entry => entry.type === 'income');
+            const categories = [...new Set(incomeData.map(entry => entry.category))];
+            const amounts = categories.map(category => 
+                incomeData.filter(entry => entry.category === category)
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição de Receitas'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update the expense distribution chart
+        function updateExpenseDistributionChart() {
+            const ctx = document.getElementById('expense-distribution-chart').getContext('2d');
+            const expenseData = sampleData.filter(entry => entry.type === 'expense');
+            const categories = [...new Set(expenseData.map(entry => entry.category))];
+            const amounts = categories.map(category => 
+                expenseData.filter(entry => entry.category === category)
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: categories,
+                    datasets: [{
+                        data: amounts,
+                        backgroundColor: [
+                            'rgb(255, 99, 132)',
+                            'rgb(54, 162, 235)',
+                            'rgb(255, 205, 86)',
+                            'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Distribuição de Despesas'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update the monthly income chart
+        function updateMonthlyIncomeChart() {
+            const ctx = document.getElementById('monthly-income-chart').getContext('2d');
+            const incomeData = sampleData.filter(entry => entry.type === 'income');
+            const months = [...new Set(incomeData.map(entry => entry.date.substring(0, 7)))];
+            const amounts = months.map(month => 
+                incomeData.filter(entry => entry.date.startsWith(month))
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Receita Mensal',
+                        data: amounts,
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgb(75, 192, 192)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update the monthly expenses chart
+        function updateMonthlyExpensesChart() {
+            const ctx = document.getElementById('monthly-expenses-chart').getContext('2d');
+            const expenseData = sampleData.filter(entry => entry.type === 'expense');
+            const months = [...new Set(expenseData.map(entry => entry.date.substring(0, 7)))];
+            const amounts = months.map(month => 
+                expenseData.filter(entry => entry.date.startsWith(month))
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [{
+                        label: 'Despesa Mensal',
+                        data: amounts,
+                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                        borderColor: 'rgb(255, 99, 132)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Function to update the cash flow chart
+        function updateCashFlowChart() {
+            const ctx = document.getElementById('cash-flow-chart').getContext('2d');
+            const months = [...new Set(sampleData.map(entry => entry.date.substring(0, 7)))];
+            const incomeData = months.map(month => 
+                sampleData.filter(entry => entry.date.startsWith(month) && entry.type === 'income')
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+            const expenseData = months.map(month => 
+                sampleData.filter(entry => entry.date.startsWith(month) && entry.type === 'expense')
+                    .reduce((sum, entry) => sum + entry.amount, 0)
+            );
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Receitas',
+                            data: incomeData,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        },
+                        {
+                            label: 'Despesas',
+                            data: expenseData,
+                            borderColor: 'rgb(255, 99, 132)',
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listener for the save entry button
+        document.getElementById('saveEntryBtn').addEventListener('click', function() {
+            const form = document.getElementById('addEntryForm');
+            const newEntry = {
+                date: form.entryDate.value,
+                description: form.entryDescription.value,
+                category: form.entryCategory.options[form.entryCategory.selectedIndex].text,
+                amount: parseFloat(form.entryAmount.value),
+                type: form.entryType.value,
+                account: form.entryAccount.options[form.entryAccount.selectedIndex].text,
+                paymentMethod: form.entryPaymentMethod.options[form.entryPaymentMethod.selectedIndex].text
+            };
+            addEntry(newEntry);
+            form.reset();
+            bootstrap.Modal.getInstance(document.getElementById('addEntryModal')).hide();
+        });
+
+        // Dark mode toggle
+        const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
+        const body = document.body;
+
+        function toggleDarkMode() {
+            body.classList.toggle('dark-mode');
+            const isDarkMode = body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateDarkModeButton();
+        }
+
+        function updateDarkModeButton() {
+            const isDarkMode = body.classList.contains('dark-mode');
+            toggleDarkModeBtn.innerHTML = isDarkMode ? 
+                '<i class="fas fa-sun"></i> Modo Claro' : 
+                '<i class="fas fa-moon"></i> Modo Escuro';
+        }
+
+        toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
+
+        // Check for saved dark mode preference
+        const savedDarkMode = localStorage.getItem('darkMode');
+        if (savedDarkMode === 'true') {
+            body.classList.add('dark-mode');
+        }
+        updateDarkModeButton();
+
+        // Daily tips
+        const tips = [
+            "Estabeleça metas financeiras claras e realistas.",
+            "Crie um orçamento mensal e siga-o rigorosamente.",
+            "Economize pelo menos 20% da sua renda todo mês.",
+            "Evite dívidas de cartão de crédito sempre que possível.",
+            "Invista em sua educação financeira.",
+            "Diversifique seus investimentos para reduzir riscos.",
+            "Mantenha um fundo de emergência para imprevistos.",
+            "Compare preços antes de fazer grandes compras.",
+            "Automatize suas economias e investimentos.",
+            "Revise seus gastos regularmente e corte despesas desnecessárias."
+        ];
+
+        function getRandomTip() {
+            return tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        function updateDailyTip() {
+            const tipElement = document.getElementById('dailyTip');
+            tipElement.textContent = getRandomTip();
+        }
+
+        // Update tip on page load
+        updateDailyTip();
+
+        // Change tip every 24 hours
+        setInterval(updateDailyTip, 24 * 60 * 60 * 1000);
+
+        // Footer button functions (placeholders)
+        function saveData() {
+            console.log("Saving data...");
+            // Implement data saving logic
+        }
+
+        function exportData() {
+            console.log("Exporting data...");
+            // Implement data export logic
+        }
+
+        function importBackup() {
+            console.log("Importing backup...");
+            // Implement backup import logic
+        }
+
+        function printPage() {
+            window.print();
+        }
+
+        function exportPDF() {
+            console.log("Exporting as PDF...");
+            // Implement PDF export logic
+        }
+
+        function exportXLS() {
+            console.log("Exporting as XLS...");
+            // Implement XLS export logic
+        }
+
+        // Initialize the page
+        updateEntriesTable();
+        updateCharts();
+    </script>
+</body>
+</html>
