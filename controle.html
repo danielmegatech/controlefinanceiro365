@@ -1,699 +1,762 @@
+<html><head><base href="/controle.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro | Dashboard</title>
 
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Controle Financeiro</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .floating-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-        }
-        .chart-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        body.dark-mode {
-            background-color: #333;
-            color: #fff;
-        }
-        body.dark-mode .bg-light {
-            background-color: #444 !important;
-        }
-        body.dark-mode .bg-primary {
-            background-color: #007bff !important;
-        }
-        body.dark-mode .table {
-            color: #fff;
-        }
-        .tip-box {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        body.dark-mode .tip-box {
-            background-color: #444;
-            border-color: #555;
-        }
-    </style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/apexcharts@3.40.0/dist/apexcharts.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" rel="stylesheet"/>
+
+<style>
+:root {
+  --primary: #fe2c55;
+  --secondary: #25f4ee; 
+  --dark: #121212;
+  --light: #ffffff;
+  --sidebar-width: 250px;
+  --bg-card: rgba(255,255,255,0.05);
+  --border-card: rgba(255,255,255,0.1);
+  --hover-card: rgba(255,255,255,0.08);
+}
+
+[data-theme="light"] {
+  --dark: #ffffff;
+  --light: #121212;
+  --bg-card: rgba(0,0,0,0.05);
+  --border-card: rgba(0,0,0,0.1);
+  --hover-card: rgba(0,0,0,0.08);
+}
+
+body {
+  background: var(--dark);
+  color: white;
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: rgba(18, 18, 18, 0.95);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  padding: 2rem;
+}
+
+.theme-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.nav-link {
+  color: rgba(255,255,255,0.8);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  background: rgba(254, 44, 85, 0.1);
+  color: var(--primary);
+}
+
+.nav-link i {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.control-card {
+  background: var(--bg-card);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-card);
+  transition: transform 0.3s ease;
+}
+
+.control-card:hover {
+  transform: translateY(-5px);
+  background: var(--hover-card);
+}
+
+.transaction-form {
+  background: var(--bg-card);
+  border-radius: 15px;
+  padding: 2rem;
+  border: 1px solid var(--border-card);
+}
+
+.custom-input {
+  background: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: white !important;
+}
+
+.custom-input:focus {
+  background: rgba(255,255,255,0.15) !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 0.25rem rgba(254, 44, 85, 0.25) !important;
+}
+
+.custom-select {
+  background-color: rgba(255,255,255,0.1) !important;
+  border: 1px solid rgba(255,255,255,0.2) !important;
+  color: white !important;
+}
+
+.transaction-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transaction-item {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: rgba(255,255,255,0.1);
+  transform: translateX(5px);
+}
+
+.btn-gradient {
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
+  border: none;
+  color: white;
+}
+
+.btn-gradient:hover {
+  opacity: 0.9;
+  color: white;
+}
+
+.animate-hover {
+  transition: all 0.3s ease;
+}
+
+.animate-hover:hover {
+  transform: translateY(-5px);
+  background: var(--hover-card);
+}
+
+.gradient-text {
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: bold;
+}
+
+.main-footer {
+  background: var(--dark);
+  color: white;
+  padding: 2rem 0;
+}
+</style>
 </head>
 <body>
-    <header class="bg-primary text-white py-3">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1>Controle Financeiro</h1>
-                </div>
-                <div class="col-md-6">
-                    <nav class="navbar navbar-expand-lg navbar-dark">
-                        <ul class="navbar-nav ml-auto">
-                            <li class="nav-item"><a class="nav-link" href="index.html">Dashboard</a></li>
-                            <li class="nav-item"><a class="nav-link" href="controle.html">Controle</a></li>
-                            <li class="nav-item"><a class="nav-link" href="dividas.html">Dívidas</a></li>
-                            <li class="nav-item"><a class="nav-link" href="cartoes.html">Cartões</a></li>
-                            <li class="nav-item"><a class="nav-link" href="investimentos.html">Investimentos</a></li>
-                            <li class="nav-item"><a class="nav-link" href="patrimonio.html">Patrimônio</a></li>
-                            <li class="nav-item"><a class="nav-link" href="veiculo.html">Veículo</a></li>
-                            <li class="nav-item"><a class="nav-link" href="configuracoes.html">Configurações</a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </header>
 
-    <main class="container mt-4">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2>Lista de Entradas</h2>
-            <button id="toggleDarkMode" class="btn btn-outline-primary">
-                <i class="fas fa-moon"></i> Modo Escuro
-            </button>
-        </div>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="d-flex align-items-center mb-4">
+    <svg width="32" height="32" viewBox="0 0 32 32" class="me-2">
+      <defs>
+        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:var(--primary)"></stop>
+          <stop offset="100%" style="stop-color:var(--secondary)"></stop>
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#logo-gradient)"></rect>
+      <text x="16" y="21" fill="white" font-size="12" text-anchor="middle" font-weight="bold">$</text>
+    </svg>
+    <span style="font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem;">
+      <span style="color: var(--primary);">Finance</span>
+      <span style="font-weight: 300; opacity: 0.9;">Dashboard</span>
+    </span>
+  </div>
 
-        <div class="tip-box mb-4">
-            <h3>Dica do Dia</h3>
-            <p id="dailyTip">Carregando dica...</p>
-        </div>
+  <nav class="nav flex-column mb-4">
+    <a href="index.html" class="nav-link">
+      <i class="fas fa-home"></i>Visão Geral
+    </a>
+    <a href="controle.html" class="nav-link active">
+      <i class="fas fa-chart-pie"></i>Controle Financeiro
+    </a>
+    <a href="dividas.html" class="nav-link">
+      <i class="fas fa-file-invoice-dollar"></i>Dívidas
+    </a>
+    <a href="cartoes.html" class="nav-link">
+      <i class="fas fa-credit-card"></i>Cartões
+    </a>
+    <a href="investimentos.html" class="nav-link">
+      <i class="fas fa-chart-line"></i>Investimentos
+    </a>
+    <a href="patrimonio.html" class="nav-link">
+      <i class="fas fa-building"></i>Patrimônio
+    </a>
+    <a href="veiculo.html" class="nav-link">
+      <i class="fas fa-car"></i>Veículos
+    </a>
+    <a href="historico.html" class="nav-link">
+      <i class="fas fa-history"></i>Histórico
+    </a>
+    <a href="configuracoes.html" class="nav-link">
+      <i class="fas fa-cog"></i>Configurações
+    </a>
+  </nav>
+</div>
 
-        <section id="entries-list">
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>Descrição</th>
-                        <th>Categoria</th>
-                        <th>Valor</th>
-                        <th>Tipo</th>
-                        <th>Conta</th>
-                        <th>Forma de Pagamento</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="entries-table-body">
-                    <!-- Entries will be dynamically added here -->
-                </tbody>
-            </table>
-            <div class="row">
-                <div class="col-md-4">
-                    <p>Total de Despesas: <span id="total-expenses">R$ 0,00</span></p>
-                </div>
-                <div class="col-md-4">
-                    <p>Total de Receitas: <span id="total-income">R$ 0,00</span></p>
-                </div>
-                <div class="col-md-4">
-                    <p>Saldo: <span id="balance">R$ 0,00</span></p>
-                </div>
-            </div>
-        </section>
-
-        <section id="analysis" class="mt-5">
-            <h2>Análises e Estatísticas</h2>
-            <div class="row">
-                <div class="col-md-6 mb-4">
-                    <h3>Saldo ao Longo do Tempo</h3>
-                    <div class="chart-container">
-                        <canvas id="balance-chart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>Distribuição de Receitas</h3>
-                    <div class="chart-container">
-                        <canvas id="income-distribution-chart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>Distribuição de Despesas</h3>
-                    <div class="chart-container">
-                        <canvas id="expense-distribution-chart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>Receitas Mensais</h3>
-                    <div class="chart-container">
-                        <canvas id="monthly-income-chart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>Despesas Mensais</h3>
-                    <div class="chart-container">
-                        <canvas id="monthly-expenses-chart"></canvas>
-                    </div>
-                </div>
-                <div class="col-md-6 mb-4">
-                    <h3>Fluxo de Caixa: Despesas x Receitas</h3>
-                    <div class="chart-container">
-                        <canvas id="cash-flow-chart"></canvas>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <footer class="bg-light text-center py-3 mt-5">
-        <div class="container">
-            <div class="row mb-3">
-                <div class="col">
-                    <button class="btn btn-outline-primary me-2" onclick="saveData()">Salvar Informações</button>
-                    <button class="btn btn-outline-secondary me-2" onclick="exportData()">Exportar Dados</button>
-                    <button class="btn btn-outline-info me-2" onclick="importBackup()">Importar Backup</button>
-                    <button class="btn btn-outline-success me-2" onclick="printPage()">Imprimir Página</button>
-                    <button class="btn btn-outline-warning me-2" onclick="exportPDF()">Exportar em PDF</button>
-                    <button class="btn btn-outline-danger" onclick="exportXLS()">Exportar em XLS</button>
-                </div>
-            </div>
-            <p>Desenvolvido por [dev.daan] © 2024</p>
-            <p>
-                <a href="politicas.html">Política de Privacidade</a> |
-                <a href="termos.html">Termos de Uso</a> |
-                <a href="contato.html">Contato</a>
-            </p>
-        </div>
-    </footer>
-
-    <button class="btn btn-primary btn-lg rounded-circle floating-button" data-bs-toggle="modal" data-bs-target="#addEntryModal">
-        <i class="fas fa-plus"></i>
+<!-- Main Content -->
+<div class="main-content">
+  <div class="theme-switch">
+    <button id="themeToggle" class="btn btn-outline-light">
+      <i class="fas fa-moon dark-icon"></i>
+      <i class="fas fa-sun light-icon d-none"></i>
     </button>
+  </div>
+  
+  <h2 class="mb-4">Controle Financeiro</h2>
 
-    <!-- Modal for adding new entry -->
-    <div class="modal fade" id="addEntryModal" tabindex="-1" aria-labelledby="addEntryModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addEntryModalLabel">Adicionar Entrada</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addEntryForm">
-                        <div class="mb-3">
-                            <label for="entryDate" class="form-label">Data</label>
-                            <input type="date" class="form-control" id="entryDate" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryDescription" class="form-label">Descrição</label>
-                            <input type="text" class="form-control" id="entryDescription" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryCategory" class="form-label">Categoria</label>
-                            <select class="form-select" id="entryCategory" required>
-                                <option value="">Selecione uma categoria</option>
-                                <optgroup label="Despesas">
-                                    <option value="moradia">🏠 Moradia</option>
-                                    <option value="compras">🛒 Compras</option>
-                                    <option value="restaurantes">🍽️ Restaurantes</option>
-                                    <option value="viagens">✈️ Viagens</option>
-                                    <option value="saude">🏥 Saúde</option>
-                                    <option value="transporte">🚍 Transporte</option>
-                                    <option value="cursos">📚 Cursos</option>
-                                    <option value="jogos">🎮 Jogos</option>
-                                    <option value="presentes">🎁 Presentes</option>
-                                    <option value="diversao">🎉 Diversão</option>
-                                    <option value="outros">🔄 Outros</option>
-                                    <option value="cartao-credito">💳 Cartão de Crédito</option>
-                                    <option value="plano-celular">📱 Plano de Celular</option>
-                                    <option value="faculdade">🎓 Faculdade</option>
-                                    <option value="barbeiro">💈 Barbeiro</option>
-                                    <option value="salao-beleza">💅 Salão de Beleza</option>
-                                    <option value="spotify">🎵 Spotify</option>
-                                    <option value="consorcio">🤝 Consórcio</option>
-                                    <option value="streaming">🎬 Streaming</option>
-                                    <option value="juridico">⚖️ Jurídico</option>
-                                    <option value="banco">🏦 Banco</option>
-                                </optgroup>
-                                <optgroup label="Receitas">
-                                    <option value="salario">💰 Salário</option>
-                                    <option value="uber">🚖 Uber</option>
-                                    <option value="ferias">🌴 Férias</option>
-                                    <option value="fgts">🏢 FGTS</option>
-                                    <option value="pis">📈 PIS</option>
-                                    <option value="lucros">💹 Lucros</option>
-                                    <option value="servicos">💻 Serviços</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryAmount" class="form-label">Valor</label>
-                            <input type="number" class="form-control" id="entryAmount" step="0.01" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryType" class="form-label">Tipo</label>
-                            <select class="form-select" id="entryType" required>
-                                <option value="expense">⤵️ Despesa</option>
-                                <option value="income">✅ Receita</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryAccount" class="form-label">Conta</label>
-                            <select class="form-select" id="entryAccount" required>
-                                <option value="banco-principal">💳 Banco Principal</option>
-                                <option value="banco-secundario">💳 Banco Secundário</option>
-                                <option value="banco-alternativo1">💳 Banco Alternativo1</option>
-                                <option value="banco-alternativo2">💳 Banco Alternativo2</option>
-                                <option value="cartao-credito-parcelado">💳 Cartão de Crédito Parcelado</option>
-                                <option value="conta-salario">🏦 Conta Salário</option>
-                                <option value="conta-internacional-wise">🌍 Conta Internacional Wise</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="entryPaymentMethod" class="form-label">Forma de Pagamento</label>
-                            <select class="form-select" id="entryPaymentMethod" required>
-                                <option value="cartao-credito">💳 Cartão de Crédito</option>
-                                <option value="cartao-debito">💳 Cartão de Débito</option>
-                                <option value="pix">⚡ Pix</option>
-                                <option value="dinheiro">💵 Dinheiro</option>
-                                <option value="cheque">🧾 Cheque</option>
-                                <option value="deposito-bancario">🏦 Depósito Bancário</option>
-                                <option value="criptomoedas">₿ Criptomoedas</option>
-                                <option value="troca">🔄 Troca</option>
-                                <option value="boleto">🧾 Boleto</option>
-                            </select>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-primary" id="saveEntryBtn">Salvar</button>
-                </div>
+  <!-- Add Transaction Form -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="transaction-form">
+        <h4 class="mb-4">Nova Transação</h4>
+        <form id="transactionForm">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">Descrição</label>
+              <input type="text" class="form-control custom-input" required>
             </div>
-        </div>
+            <div class="col-md-3">
+              <label class="form-label">Valor</label>
+              <input type="number" step="0.01" class="form-control custom-input" required>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Data</label>
+              <input type="date" class="form-control custom-input" required>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Tipo</label>
+              <select name="type" class="form-select custom-select">
+                <option value="expense">⤵️ Despesa</option>
+                <option value="income">✅ Receita</option>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Categoria</label>
+              <select name="category" class="form-select custom-select" id="category">
+                <optgroup label="Despesas">
+                  <option value="moradia">🏠 Moradia</option>
+                  <option value="compras">🛒 Compras</option>
+                  <option value="restaurantes">🍽️ Restaurantes</option>
+                  <option value="viagens">✈️ Viagens</option>
+                  <option value="saude">🏥 Saúde</option>
+                  <option value="transporte">🚍 Transporte</option>
+                  <option value="cursos">📚 Cursos</option>
+                  <option value="jogos">🎮 Jogos</option>
+                  <option value="presentes">🎁 Presentes</option>
+                  <option value="diversao">🎉 Diversão</option>
+                  <option value="outros">🔄 Outros</option>
+                  <option value="cartao">💳 Cartão de Crédito</option>
+                  <option value="celular">📱 Plano de Celular</option>
+                  <option value="faculdade">🎓 Faculdade</option>
+                  <option value="barbeiro">💈 Barbeiro</option>
+                  <option value="beleza">💅 Salão de Beleza</option>
+                  <option value="spotify">🎵 Spotify</option>
+                  <option value="consorcio">🤝 Consórcio</option>
+                  <option value="streaming">🎬 Streaming</option>
+                  <option value="juridico">⚖️ Jurídico</option>
+                  <option value="banco">🏦 Banco</option>
+                </optgroup>
+                <optgroup label="Receitas">
+                  <option value="salario">💰 Salário</option>
+                  <option value="uber">🚖 Uber</option>
+                  <option value="ferias">🌴 Férias</option>
+                  <option value="fgts">🏢 FGTS</option>
+                  <option value="pis">📈 PIS</option>
+                  <option value="lucros">💹 Lucros</option>
+                  <option value="servicos">💻 Serviços</option>
+                </optgroup>
+              </select>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Método de Pagamento</label>
+              <select name="method" class="form-select custom-select">
+                <option value="credit">💳 Cartão de Crédito</option>
+                <option value="debit">💳 Cartão de Débito</option>
+                <option value="pix">⚡ Pix</option>
+                <option value="cash">💵 Dinheiro</option>
+                <option value="check">🧾 Cheque</option>
+                <option value="deposit">🏦 Depósito Bancário</option>
+                <option value="crypto">₿ Criptomoedas</option>
+                <option value="trade">🔄 Troca</option>
+                <option value="bill">🧾 Boleto</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-gradient">
+                <i class="fas fa-plus me-2"></i>Adicionar Transação
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Sample data for demonstration
-        let sampleData = [
-            { date: '2023-05-01', description: 'Salário', category: '💰 Salário', amount: 5000, type: 'income', account: '💳 Banco Principal', paymentMethod: '🏦 Depósito Bancário' },
-            { date: '2023-05-05', description: 'Aluguel', category: '🏠 Moradia', amount: 1500, type: 'expense', account: '💳 Banco Principal', paymentMethod: '⚡ Pix' },
-            { date: '2023-05-10', description: 'Supermercado', category: '🛒 Compras', amount: 500, type: 'expense', account: '💳 Cartão de Crédito Parcelado', paymentMethod: '💳 Cartão de Crédito' },
-            { date: '2023-05-15', description: 'Freelance', category: '💻 Serviços', amount: 1000, type: 'income', account: '🌍 Conta Internacional Wise', paymentMethod: '🏦 Depósito Bancário' },
-        ];
+  <!-- Transactions List -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="control-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">Transações Recentes</h4>
+          <div class="btn-group">
+            <button class="btn btn-outline-light btn-sm">
+              <i class="fas fa-filter me-2"></i>Filtrar
+            </button>
+            <button class="btn btn-outline-light btn-sm">
+              <i class="fas fa-sort me-2"></i>Ordenar
+            </button>
+          </div>
+        </div>
+        
+        <div class="table-responsive">
+          <table id="transactionsTable" class="table table-dark">
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Descrição</th>
+                <th>Categoria</th>
+                <th>Valor</th>
+                <th>Método</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>2024-01-15</td>
+                <td>Supermercado Extra</td>
+                <td><span class="badge bg-info">Alimentação</span></td>
+                <td class="text-danger">- R$ 450,00</td>
+                <td><i class="fas fa-credit-card"></i> Crédito</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+              <tr>
+                <td>2024-01-14</td>
+                <td>Salário</td>
+                <td><span class="badge bg-success">Receita</span></td>
+                <td class="text-success">+ R$ 8.500,00</td>
+                <td><i class="fas fa-money-bill-wave"></i> PIX</td>
+                <td>
+                  <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
 
-        // Function to format currency
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  <!-- Charts Section -->
+  <div class="row mt-4">
+    <div class="col-md-6 mb-4">
+      <div class="control-card">
+        <h4>Distribuição por Categoria</h4>
+        <canvas id="categoryChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-6 mb-4">
+      <div class="control-card">
+        <h4>Receitas vs Despesas</h4>
+        <canvas id="balanceChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="control-card">
+        <h4>Fluxo Financeiro</h4>
+        <canvas id="timelineChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer with Actions -->
+  <footer class="main-footer">
+    <div class="container">
+      <div class="row">
+        <div class="col-12 text-center mb-3">
+          <button class="btn btn-outline-light mx-1" onclick="saveData()">
+            <i class="fas fa-save"></i> Salvar
+          </button>
+          <button class="btn btn-outline-light mx-1" onclick="exportPDF()">
+            <i class="fas fa-file-pdf"></i> PDF
+          </button>
+          <button class="btn btn-outline-light mx-1" onclick="exportXLS()">
+            <i class="fas fa-file-excel"></i> XLS
+          </button>
+          <button class="btn btn-outline-light mx-1" onclick="printPage()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+          <button class="btn btn-outline-light mx-1" onclick="importBackup()">
+            <i class="fas fa-upload"></i> Importar
+          </button>
+          <button class="btn btn-outline-light mx-1" onclick="exportBackup()">
+            <i class="fas fa-download"></i> Exportar
+          </button>
+        </div>
+        <div class="col-12 text-center">
+          <p>Desenvolvido por <a href="https://dev.daan" class="gradient-text">dev.daan</a> © 2024</p>
+          <small>
+            <a href="/privacy">Política de Privacidade</a> |
+            <a href="/terms">Termos de Uso</a> |
+            <a href="/contact">Contato</a>
+          </small>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.24/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+$(document).ready(function() {
+  $('#transactionsTable').DataTable({
+    responsive: true,
+    language: {
+      url: '//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese-Brasil.json'
+    },
+    order: [[0, 'desc']],
+    pageLength: 10,
+    columnDefs: [{
+      targets: -1,
+      defaultContent: `
+        <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="deleteTransaction(this)"><i class="fas fa-trash"></i></button>
+      `
+    }]
+  });
+
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcons(savedTheme);
+
+  $('#themeToggle').on('click', toggleTheme);
+
+  $('#transactionForm').on('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = {
+      description: $(this).find('input[type="text"]').val(),
+      amount: $(this).find('input[type="number"]').val(),
+      date: $(this).find('input[type="date"]').val(),
+      type: $(this).find('select[name="type"]').val(),
+      category: $(this).find('select[name="category"]').val(),
+      method: $(this).find('select[name="method"]').val()
+    };
+
+    const editIndex = $(this).data('edit-index');
+    
+    if (typeof editIndex !== 'undefined') {
+      updateTransaction(editIndex, formData);
+      $(this).removeData('edit-index');
+      $(this).find('button[type="submit"]').html('<i class="fas fa-plus me-2"></i>Adicionar Transação');
+    } else {
+      saveTransaction(formData);
+    }
+
+    this.reset();
+    showNotification('Transação salva com sucesso!', 'success');
+  });
+
+  $(document).on('click', '.btn-danger', function() {
+    if(confirm('Tem certeza que deseja excluir esta transação?')) {
+      $(this).closest('tr').remove();
+      showNotification('Transação excluída com sucesso!', 'success');
+    }
+  });
+
+  initializeCharts();
+});
+
+function toggleTheme() {
+  const theme = localStorage.getItem('theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  updateThemeIcons(theme);
+}
+
+function updateThemeIcons(theme) {
+  if (theme === 'light') {
+    document.querySelector('.dark-icon').classList.add('d-none');
+    document.querySelector('.light-icon').classList.remove('d-none');
+  } else {
+    document.querySelector('.light-icon').classList.add('d-none');
+    document.querySelector('.dark-icon').classList.remove('d-none');
+  }
+}
+
+function saveTransaction(transaction) {
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions.push(transaction);
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+  
+  const table = $('#transactionsTable').DataTable();
+  const row = [
+    transaction.date,
+    transaction.description,
+    `<span class="badge bg-${transaction.type === 'income' ? 'success' : 'info'}">${transaction.category}</span>`,
+    `<span class="text-${transaction.type === 'income' ? 'success' : 'danger'}">${transaction.type === 'income' ? '+' : '-'} R$ ${parseFloat(transaction.amount).toFixed(2)}</span>`,
+    `<i class="fas fa-${getMethodIcon(transaction.method)}"></i> ${transaction.method}`,
+    `
+      <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-sm btn-danger" onclick="deleteTransaction(this)"><i class="fas fa-trash"></i></button>
+    `
+  ];
+  
+  table.row.add(row).draw();
+  updateCharts();
+}
+
+function editTransaction(element) {
+  const row = $(element).closest('tr');
+  const data = $('#transactionsTable').DataTable().row(row).data();
+  
+  const form = $('#transactionForm');
+  form.find('input[type="text"]').val(data[1]);
+  form.find('input[type="number"]').val(parseAmount(data[3]));
+  form.find('input[type="date"]').val(data[0]);
+  form.find('select[name="type"]').val(data[3].includes('+') ? 'income' : 'expense');
+  form.find('select[name="category"]').val(getCategoryFromBadge(data[2]));
+  form.find('select[name="method"]').val(getMethodFromIcon(data[4]));
+
+  form.data('edit-index', row.index());
+  form.find('button[type="submit"]').html('<i class="fas fa-check me-2"></i>Atualizar Transação');
+  form[0].scrollIntoView({behavior: 'smooth'});
+}
+
+function parseAmount(amountText) {
+  return parseFloat(amountText.replace(/[^0-9.-]+/g, ''));
+}
+
+function getCategoryFromBadge(badgeHtml) {
+  const text = $(badgeHtml).text();
+  return text.toLowerCase();
+}
+
+function getMethodFromIcon(methodHtml) {
+  const text = $(methodHtml).text().trim();
+  return text.toLowerCase();
+}
+
+function updateTransaction(index, transaction) {
+  let transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  transactions[index] = transaction;
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+  
+  const table = $('#transactionsTable').DataTable();
+  
+  const row = [
+    transaction.date,
+    transaction.description,
+    `<span class="badge bg-${transaction.type === 'income' ? 'success' : 'info'}">${transaction.category}</span>`,
+    `<span class="text-${transaction.type === 'income' ? 'success' : 'danger'}">${transaction.type === 'income' ? '+' : '-'} R$ ${parseFloat(transaction.amount).toFixed(2)}</span>`,
+    `<i class="fas fa-${getMethodIcon(transaction.method)}"></i> ${transaction.method}`,
+    `
+      <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+      <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+    `
+  ];
+  
+  table.row(index).data(row).draw();
+  updateCharts();
+}
+
+function showNotification(message, type = 'info') {
+  const toast = `
+    <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body">
+          ${message}
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      </div>
+    </div>
+  `;
+  
+  const toastContainer = document.createElement('div');
+  toastContainer.className = 'position-fixed bottom-0 end-0 p-3';
+  toastContainer.innerHTML = toast;
+  document.body.appendChild(toastContainer);
+  
+  const toastElement = new bootstrap.Toast(toastContainer.querySelector('.toast'));
+  toastElement.show();
+  
+  setTimeout(() => toastContainer.remove(), 3000);
+}
+
+function loadTransactions() {
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  const table = $('#transactionsTable').DataTable();
+  
+  transactions.forEach(transaction => {
+    const row = [
+      transaction.date,
+      transaction.description,
+      `<span class="badge bg-${transaction.type === 'income' ? 'success' : 'info'}">${transaction.category}</span>`,
+      `<span class="text-${transaction.type === 'income' ? 'success' : 'danger'}">${transaction.type === 'income' ? '+' : '-'} R$ ${parseFloat(transaction.amount).toFixed(2)}</span>`,
+      `<i class="fas fa-${getMethodIcon(transaction.method)}"></i> ${transaction.method}`,
+      `
+        <button class="btn btn-sm btn-warning me-1" onclick="editTransaction(this)"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+      `
+    ];
+    
+    table.row.add(row).draw();
+  });
+}
+
+function getMethodIcon(method) {
+  const icons = {
+    credit: 'credit-card',
+    debit: 'credit-card',
+    cash: 'money-bill-wave',
+    pix: 'mobile-alt'
+  };
+  return icons[method] || 'money-bill-wave';
+}
+
+let categoryChart, balanceChart, timelineChart;
+
+function initializeCharts() {
+  categoryChart = new Chart(document.getElementById('categoryChart'), {
+    type: 'doughnut',
+    data: {
+      labels: [],
+      datasets: [{
+        data: [],
+        backgroundColor: [
+          '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+          '#FF9F40', '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'right',
         }
+      }
+    }
+  });
 
-        // Function to update the entries table
-        function updateEntriesTable() {
-            const tableBody = document.getElementById('entries-table-body');
-            tableBody.innerHTML = '';
-
-            let totalExpenses = 0;
-            let totalIncome = 0;
-
-            sampleData.forEach((entry, index) => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${entry.date}</td>
-                    <td>${entry.description}</td>
-                    <td>${entry.category}</td>
-                    <td>${formatCurrency(entry.amount)}</td>
-                    <td>${entry.type === 'income' ? '✅ Receita' : '⤵️ Despesa'}</td>
-                    <td>${entry.account}</td>
-                    <td>${entry.paymentMethod}</td>
-                    <td>
-                        <button class="btn btn-sm btn-outline-primary me-1" onclick="editEntry(${index})">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deleteEntry(${index})">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(row);
-
-                if (entry.type === 'income') {
-                    totalIncome += entry.amount;
-                } else {
-                    totalExpenses += entry.amount;
-                }
-            });
-
-            document.getElementById('total-expenses').textContent = formatCurrency(totalExpenses);
-            document.getElementById('total-income').textContent = formatCurrency(totalIncome);
-            document.getElementById('balance').textContent = formatCurrency(totalIncome - totalExpenses);
+  balanceChart = new Chart(document.getElementById('balanceChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Receitas', 'Despesas'],
+      datasets: [{
+        data: [0, 0],
+        backgroundColor: ['#4BC0C0', '#FF6384']
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
         }
+      }
+    }
+  });
 
-        // Function to add a new entry
-        function addEntry(entry) {
-            sampleData.push(entry);
-            updateEntriesTable();
-            updateCharts();
+  timelineChart = new Chart(document.getElementById('timelineChart'), {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Saldo',
+        data: [],
+        borderColor: '#4BC0C0',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
         }
+      }
+    }
+  });
 
-        // Function to edit an entry (placeholder)
-        function editEntry(index) {
-            console.log('Edit entry:', index);
-            // Implement edit functionality
-        }
+  loadTransactions();
+  updateCharts();
+}
 
-        // Function to delete an entry
-        function deleteEntry(index) {
-            sampleData.splice(index, 1);
-            updateEntriesTable();
-            updateCharts();
-        }
+function updateCharts() {
+  const transactions = JSON.parse(localStorage.getItem('transactions')) || [];
+  
+  const categories = {};
+  transactions.forEach(t => {
+    categories[t.category] = (categories[t.category] || 0) + parseFloat(t.amount);
+  });
+  
+  categoryChart.data.labels = Object.keys(categories);
+  categoryChart.data.datasets[0].data = Object.values(categories);
+  categoryChart.update();
 
-        // Function to update all charts
-        function updateCharts() {
-            updateBalanceChart();
-            updateIncomeDistributionChart();
-            updateExpenseDistributionChart();
-            updateMonthlyIncomeChart();
-            updateMonthlyExpensesChart();
-            updateCashFlowChart();
-        }
+  const totals = transactions.reduce((acc, t) => {
+    if (t.type === 'income') {
+      acc.income += parseFloat(t.amount);
+    } else {
+      acc.expense += parseFloat(t.amount);
+    }
+    return acc;
+  }, { income: 0, expense: 0 });
 
-        // Function to update the balance chart
-        function updateBalanceChart() {
-            const ctx = document.getElementById('balance-chart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: sampleData.map(entry => entry.date),
-                    datasets: [{
-                        label: 'Saldo',
-                        data: sampleData.map(entry => entry.type === 'income' ? entry.amount : -entry.amount),
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
+  balanceChart.data.datasets[0].data = [totals.income, totals.expense];
+  balanceChart.update();
 
-        // Function to update the income distribution chart
-        function updateIncomeDistributionChart() {
-            const ctx = document.getElementById('income-distribution-chart').getContext('2d');
-            const incomeData = sampleData.filter(entry => entry.type === 'income');
-            const categories = [...new Set(incomeData.map(entry => entry.category))];
-            const amounts = categories.map(category => 
-                incomeData.filter(entry => entry.category === category)
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
+  const timeline = transactions.sort((a, b) => new Date(a.date) - new Date(b.date));
+  let balance = 0;
+  const balances = timeline.map(t => {
+    balance += t.type === 'income' ? parseFloat(t.amount) : -parseFloat(t.amount);
+    return balance;
+  });
 
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: amounts,
-                        backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(153, 102, 255)',
-                            'rgb(255, 159, 64)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribuição de Receitas'
-                        }
-                    }
-                }
-            });
-        }
+  timelineChart.data.labels = timeline.map(t => t.date);
+  timelineChart.data.datasets[0].data = balances;
+  timelineChart.update();
+}
 
-        // Function to update the expense distribution chart
-        function updateExpenseDistributionChart() {
-            const ctx = document.getElementById('expense-distribution-chart').getContext('2d');
-            const expenseData = sampleData.filter(entry => entry.type === 'expense');
-            const categories = [...new Set(expenseData.map(entry => entry.category))];
-            const amounts = categories.map(category => 
-                expenseData.filter(entry => entry.category === category)
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
+loadTransactions();
+</script>
 
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: categories,
-                    datasets: [{
-                        data: amounts,
-                        backgroundColor: [
-                            'rgb(255, 99, 132)',
-                            'rgb(54, 162, 235)',
-                            'rgb(255, 205, 86)',
-                            'rgb(75, 192, 192)',
-                            'rgb(153, 102, 255)',
-                            'rgb(255, 159, 64)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Distribuição de Despesas'
-                        }
-                    }
-                }
-            });
-        }
-
-        // Function to update the monthly income chart
-        function updateMonthlyIncomeChart() {
-            const ctx = document.getElementById('monthly-income-chart').getContext('2d');
-            const incomeData = sampleData.filter(entry => entry.type === 'income');
-            const months = [...new Set(incomeData.map(entry => entry.date.substring(0, 7)))];
-            const amounts = months.map(month => 
-                incomeData.filter(entry => entry.date.startsWith(month))
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Receita Mensal',
-                        data: amounts,
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
-                        borderColor: 'rgb(75, 192, 192)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Function to update the monthly expenses chart
-        function updateMonthlyExpensesChart() {
-            const ctx = document.getElementById('monthly-expenses-chart').getContext('2d');
-            const expenseData = sampleData.filter(entry => entry.type === 'expense');
-            const months = [...new Set(expenseData.map(entry => entry.date.substring(0, 7)))];
-            const amounts = months.map(month => 
-                expenseData.filter(entry => entry.date.startsWith(month))
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
-
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: months,
-                    datasets: [{
-                        label: 'Despesa Mensal',
-                        data: amounts,
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)',
-                        borderColor: 'rgb(255, 99, 132)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Function to update the cash flow chart
-        function updateCashFlowChart() {
-            const ctx = document.getElementById('cash-flow-chart').getContext('2d');
-            const months = [...new Set(sampleData.map(entry => entry.date.substring(0, 7)))];
-            const incomeData = months.map(month => 
-                sampleData.filter(entry => entry.date.startsWith(month) && entry.type === 'income')
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
-            const expenseData = months.map(month => 
-                sampleData.filter(entry => entry.date.startsWith(month) && entry.type === 'expense')
-                    .reduce((sum, entry) => sum + entry.amount, 0)
-            );
-
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months,
-                    datasets: [
-                        {
-                            label: 'Receitas',
-                            data: incomeData,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1
-                        },
-                        {
-                            label: 'Despesas',
-                            data: expenseData,
-                            borderColor: 'rgb(255, 99, 132)',
-                            tension: 0.1
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-        }
-
-        // Event listener for the save entry button
-        document.getElementById('saveEntryBtn').addEventListener('click', function() {
-            const form = document.getElementById('addEntryForm');
-            const newEntry = {
-                date: form.entryDate.value,
-                description: form.entryDescription.value,
-                category: form.entryCategory.options[form.entryCategory.selectedIndex].text,
-                amount: parseFloat(form.entryAmount.value),
-                type: form.entryType.value,
-                account: form.entryAccount.options[form.entryAccount.selectedIndex].text,
-                paymentMethod: form.entryPaymentMethod.options[form.entryPaymentMethod.selectedIndex].text
-            };
-            addEntry(newEntry);
-            form.reset();
-            bootstrap.Modal.getInstance(document.getElementById('addEntryModal')).hide();
-        });
-
-        // Dark mode toggle
-        const toggleDarkModeBtn = document.getElementById('toggleDarkMode');
-        const body = document.body;
-
-        function toggleDarkMode() {
-            body.classList.toggle('dark-mode');
-            const isDarkMode = body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateDarkModeButton();
-        }
-
-        function updateDarkModeButton() {
-            const isDarkMode = body.classList.contains('dark-mode');
-            toggleDarkModeBtn.innerHTML = isDarkMode ? 
-                '<i class="fas fa-sun"></i> Modo Claro' : 
-                '<i class="fas fa-moon"></i> Modo Escuro';
-        }
-
-        toggleDarkModeBtn.addEventListener('click', toggleDarkMode);
-
-        // Check for saved dark mode preference
-        const savedDarkMode = localStorage.getItem('darkMode');
-        if (savedDarkMode === 'true') {
-            body.classList.add('dark-mode');
-        }
-        updateDarkModeButton();
-
-        // Daily tips
-        const tips = [
-            "Estabeleça metas financeiras claras e realistas.",
-            "Crie um orçamento mensal e siga-o rigorosamente.",
-            "Economize pelo menos 20% da sua renda todo mês.",
-            "Evite dívidas de cartão de crédito sempre que possível.",
-            "Invista em sua educação financeira.",
-            "Diversifique seus investimentos para reduzir riscos.",
-            "Mantenha um fundo de emergência para imprevistos.",
-            "Compare preços antes de fazer grandes compras.",
-            "Automatize suas economias e investimentos.",
-            "Revise seus gastos regularmente e corte despesas desnecessárias."
-        ];
-
-        function getRandomTip() {
-            return tips[Math.floor(Math.random() * tips.length)];
-        }
-
-        function updateDailyTip() {
-            const tipElement = document.getElementById('dailyTip');
-            tipElement.textContent = getRandomTip();
-        }
-
-        // Update tip on page load
-        updateDailyTip();
-
-        // Change tip every 24 hours
-        setInterval(updateDailyTip, 24 * 60 * 60 * 1000);
-
-        // Footer button functions (placeholders)
-        function saveData() {
-            console.log("Saving data...");
-            // Implement data saving logic
-        }
-
-        function exportData() {
-            console.log("Exporting data...");
-            // Implement data export logic
-        }
-
-        function importBackup() {
-            console.log("Importing backup...");
-            // Implement backup import logic
-        }
-
-        function printPage() {
-            window.print();
-        }
-
-        function exportPDF() {
-            console.log("Exporting as PDF...");
-            // Implement PDF export logic
-        }
-
-        function exportXLS() {
-            console.log("Exporting as XLS...");
-            // Implement XLS export logic
-        }
-
-        // Initialize the page
-        updateEntriesTable();
-        updateCharts();
-    </script>
-</body>
-</html>
+</body></html>

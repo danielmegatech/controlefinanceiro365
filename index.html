@@ -1,343 +1,434 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerenciamento Financeiro Pessoal</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #4e54c8;
-            --secondary-color: #8f94fb;
-            --background-color: #f0f2f5;
-            --text-color: #333;
-            --card-bg: #ffffff;
-            --hover-color: #e8eaf6;
-        }
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .dark-mode {
-            --background-color: #1a1a2e;
-            --text-color: #e0e0e0;
-            --card-bg: #16213e;
-            --hover-color: #0f3460;
-        }
-        .navbar {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .navbar-brand, .nav-link {
-            color: #ffffff !important;
-        }
-        .nav-link:hover {
-            color: var(--hover-color) !important;
-        }
-        .card {
-            border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: transform 0.3s, box-shadow 0.3s;
-            background-color: var(--card-bg);
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-        }
-        .chart-container {
-            position: relative;
-            height: 300px;
-            width: 100%;
-        
-        }
-        .tip-box {
-            background-color: var(--card-bg);
-            border-left: 5px solid var(--primary-color);
-            padding: 20px;
-            margin-top: 30px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-        }
-        .card-title {
-            color: var(--primary-color);
-            font-weight: 600;
-        }
-        .form-switch .form-check-input {
-            width: 3em;
-        }
-        .form-switch .form-check-input:checked {
-            background-color: var(--primary-color);
-            border-color: var(--primary-color);
-        }
-    </style>
+<html><head><base href="/controle.html/index.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Controle Financeiro | Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<link href="https://cdn.jsdelivr.net/npm/apexcharts@3.40.0/dist/apexcharts.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/1.10.24/css/jquery.dataTables.min.css" rel="stylesheet"/>
+
+<style>
+:root {
+  --primary: #fe2c55;
+  --secondary: #25f4ee; 
+  --dark: #121212;
+  --light: #ffffff;
+  --sidebar-width: 250px;
+  --bg-card: rgba(255,255,255,0.05);
+  --border-card: rgba(255,255,255,0.1);
+  --hover-card: rgba(255,255,255,0.08);
+}
+
+[data-theme="light"] {
+  --dark: #ffffff;
+  --light: #121212;
+  --bg-card: rgba(0,0,0,0.05);
+  --border-card: rgba(0,0,0,0.1);
+  --hover-card: rgba(0,0,0,0.08);
+}
+
+body {
+  background: var(--dark);
+  color: var(--light);
+  font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: var(--sidebar-width);
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: rgba(18, 18, 18, 0.95);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding: 1.5rem;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  padding: 2rem;
+}
+
+.nav-link {
+  color: rgba(255,255,255,0.8);
+  padding: 0.8rem 1rem;
+  border-radius: 10px;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover, .nav-link.active {
+  background: rgba(254, 44, 85, 0.1);
+  color: var(--primary);
+}
+
+.nav-link i {
+  width: 20px;
+  margin-right: 10px;
+}
+
+.overview-card {
+  background: var(--bg-card);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-card);
+  transition: transform 0.3s ease;
+}
+
+.overview-card:hover {
+  transform: translateY(-5px);
+  background: var(--hover-card);
+}
+
+.balance-card {
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
+  color: white;
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border-radius: 15px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-card);
+  height: 100%;
+}
+
+.theme-switch {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.recent-transactions {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.transaction-item {
+  background: var(--bg-card);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+  background: var(--hover-card);
+  transform: translateX(5px);
+}
+</style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#"><i class="fas fa-wallet me-2"></i>Finanças Pessoais</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="index.html"><i class="fas fa-chart-line me-1"></i>Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="controle.html"><i class="fas fa-exchange-alt me-1"></i>Controle</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="dividas.html"><i class="fas fa-file-invoice-dollar me-1"></i>Dívidas</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="cartoes.html"><i class="fas fa-credit-card me-1"></i>Cartões</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="investimentos.html"><i class="fas fa-chart-bar me-1"></i>Investimentos</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="patrimonio.html"><i class="fas fa-home me-1"></i>Patrimônio</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="veiculo.html"><i class="fas fa-car me-1"></i>Veículo</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="configuracoes.html"><i class="fas fa-cog me-1"></i>Configurações</a>
-                    </li>
-                </ul>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="darkModeToggle">
-                    <label class="form-check-label text-white" for="darkModeToggle">Modo Escuro</label>
-                </div>
-            </div>
-        </div>
-    </nav>
 
-    <div class="container mt-5">
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="d-flex align-items-center mb-4">
+    <svg width="32" height="32" viewBox="0 0 32 32" class="me-2">
+      <defs>
+        <linearGradient id="logo-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:var(--primary)"></stop>
+          <stop offset="100%" style="stop-color:var(--secondary)"></stop>
+        </linearGradient>
+      </defs>
+      <rect x="4" y="4" width="24" height="24" rx="6" fill="url(#logo-gradient)"></rect>
+      <text x="16" y="21" fill="white" font-size="12" text-anchor="middle" font-weight="bold">$</text>
+    </svg>
+    <span style="font-weight: 800; letter-spacing: -0.5px; font-size: 1.4rem;">
+      <span style="color: var(--primary);">Finance</span>
+      <span style="font-weight: 300; opacity: 0.9;">Dashboard</span>
+    </span>
+  </div>
 
-    <div class="container mt-5">
-        <h1 class="mb-4 text-center">Dashboard Financeiro</h1>
-        
-        <div class="row">
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><i class="fas fa-balance-scale me-2"></i>Saldo Atual</h5>
-                        <h2 class="card-text" id="currentBalance">R$ 5.000,00</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><i class="fas fa-arrow-up me-2"></i>Receitas do Mês</h5>
-                        <h2 class="card-text text-success" id="monthlyIncome">R$ 3.500,00</h2>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <h5 class="card-title"><i class="fas fa-arrow-down me-2"></i>Despesas do Mês</h5>
-                        <h2 class="card-text text-danger" id="monthlyExpenses">R$ 2.800,00</h2>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <nav class="nav flex-column mb-4">
+    <a href="index.html" class="nav-link active">
+      <i class="fas fa-home"></i>Visão Geral
+    </a>
+    <a href="controle.html" class="nav-link">
+      <i class="fas fa-chart-pie"></i>Controle Financeiro
+    </a>
+    <a href="dividas.html" class="nav-link">
+      <i class="fas fa-file-invoice-dollar"></i>Dívidas
+    </a>
+    <a href="cartoes.html" class="nav-link">
+      <i class="fas fa-credit-card"></i>Cartões
+    </a>
+    <a href="investimentos.html" class="nav-link">
+      <i class="fas fa-chart-line"></i>Investimentos
+    </a>
+    <a href="patrimonio.html" class="nav-link">
+      <i class="fas fa-building"></i>Patrimônio
+    </a>
+    <a href="veiculo.html" class="nav-link">
+      <i class="fas fa-car"></i>Veículos
+    </a>
+    <a href="historico.html" class="nav-link">
+      <i class="fas fa-history"></i>Histórico
+    </a>
+    <a href="configuracoes.html" class="nav-link">
+      <i class="fas fa-cog"></i>Configurações
+    </a>
+  </nav>
+</div>
 
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-chart-bar me-2"></i>Resumo Mensal</h5>
-                        <div class="chart-container">
-                            <canvas id="monthlyOverviewChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-pie-chart me-2"></i>Despesas por Categoria</h5>
-                        <div class="chart-container">
-                            <canvas id="expensesByCategoryChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+<!-- Main Content -->
+<div class="main-content">
+  <div class="theme-switch">
+    <button id="themeToggle" class="btn btn-outline-light">
+      <i class="fas fa-moon dark-icon"></i>
+      <i class="fas fa-sun light-icon d-none"></i>
+    </button>
+  </div>
 
-        <div class="row">
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-chart-line me-2"></i>Evolução Patrimonial</h5>
-                        <div class="chart-container">
-                            <canvas id="netWorthChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title"><i class="fas fa-crystal-ball me-2"></i>Previsão de Gastos Futuros</h5>
-                        <div class="chart-container">
-                            <canvas id="futurePredictionChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  <h2 class="mb-4">Dashboard</h2>
 
-        <div class="row">
-            <div class="col-12">
-                <div class="tip-box">
-                    <h5><i class="fas fa-lightbulb me-2"></i>Dica Financeira</h5>
-                    <p id="financialTip" class="mb-0">Considere criar um fundo de emergência para cobrir 3 a 6 meses de despesas. Isso pode ajudar em situações inesperadas.</p>
-                </div>
-            </div>
-        </div>
+  <!-- Balance Overview -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="balance-card">
+        <h4>Saldo Total</h4>
+        <h2 class="mb-0">R$ <span id="totalBalance">8.500,00</span></h2>
+        <small>Atualizado em <span id="lastUpdate">15/01/2024</span></small>
+      </div>
     </div>
+    <div class="col-md-3">
+      <div class="overview-card text-success">
+        <h5>Receitas</h5>
+        <h3>R$ <span id="totalIncome">12.500,00</span></h3>
+        <small><i class="fas fa-arrow-up"></i> 15% este mês</small>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="overview-card text-danger">
+        <h5>Despesas</h5>
+        <h3>R$ <span id="totalExpenses">4.000,00</span></h3>
+        <small><i class="fas fa-arrow-down"></i> 8% este mês</small>
+      </div>
+    </div>
+  </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Dark mode toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const body = document.body;
+  <!-- Charts -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <div class="chart-card">
+        <h4>Fluxo Financeiro</h4>
+        <canvas id="cashFlowChart"></canvas>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="chart-card">
+        <h4>Despesas por Categoria</h4>
+        <canvas id="expensesChart"></canvas>
+      </div>
+    </div>
+  </div>
 
-        darkModeToggle.addEventListener('change', () => {
-            body.classList.toggle('dark-mode');
-            localStorage.setItem('darkMode', body.classList.contains('dark-mode'));
-        });
+  <!-- Recent Transactions -->
+  <div class="row">
+    <div class="col-md-8">
+      <div class="overview-card">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h4 class="mb-0">Transações Recentes</h4>
+          <a href="controle.html" class="btn btn-sm btn-outline-light">Ver Todas</a>
+        </div>
+        <div class="recent-transactions">
+          <!-- Transaction items will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4">
+      <div class="overview-card">
+        <h4>Próximos Pagamentos</h4>
+        <div class="list-group list-group-flush">
+          <!-- Upcoming payments will be dynamically added here -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-        // Check for saved dark mode preference
-        if (localStorage.getItem('darkMode') === 'true') {
-            body.classList.add('dark-mode');
-            darkModeToggle.checked = true;
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+// Theme Toggle
+function toggleTheme() {
+  const theme = localStorage.getItem('theme') === 'light' ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  updateThemeIcons(theme);
+}
+
+function updateThemeIcons(theme) {
+  if (theme === 'light') {
+    document.querySelector('.dark-icon').classList.add('d-none');
+    document.querySelector('.light-icon').classList.remove('d-none');
+  } else {
+    document.querySelector('.light-icon').classList.add('d-none');
+    document.querySelector('.dark-icon').classList.remove('d-none');
+  }
+}
+
+// Initialize Charts
+document.addEventListener('DOMContentLoaded', function() {
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcons(savedTheme);
+
+  document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+
+  // Cash Flow Chart
+  const cashFlowCtx = document.getElementById('cashFlowChart').getContext('2d');
+  new Chart(cashFlowCtx, {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'Receitas',
+        data: [12500, 11000, 12000, 15000, 10000, 12500],
+        borderColor: '#4BC0C0',
+        tension: 0.1
+      }, {
+        label: 'Despesas',
+        data: [4000, 5000, 4500, 3500, 4800, 4000],
+        borderColor: '#FF6384',
+        tension: 0.1
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'top',
         }
-
-        // Chart initialization
-        function initCharts() {
-            // Monthly Overview Chart
-            new Chart(document.getElementById('monthlyOverviewChart'), {
-                type: 'bar',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [{
-                        label: 'Receitas',
-                        data: [3000, 3200, 3100, 3500, 3300, 3500],
-                        backgroundColor: 'rgba(75, 192, 192, 0.6)'
-                    }, {
-                        label: 'Despesas',
-                        data: [2500, 2700, 2600, 2800, 2900, 2800],
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-
-            // Expenses by Category Chart
-            new Chart(document.getElementById('expensesByCategoryChart'), {
-                type: 'doughnut',
-                data: {
-                    labels: ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Saúde'],
-                    datasets: [{
-                        data: [1000, 600, 400, 300, 500],
-                        backgroundColor: [
-                            'rgba(255, 99, 132, 0.8)',
-                            'rgba(54, 162, 235, 0.8)',
-                            'rgba(255, 206, 86, 0.8)',
-                            'rgba(75, 192, 192, 0.8)',
-                            'rgba(153, 102, 255, 0.8)'
-                        ]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-
-            // Net Worth Chart
-            new Chart(document.getElementById('netWorthChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
-                    datasets: [{
-                        label: 'Patrimônio Líquido',
-                        data: [10000, 11000, 12000, 13500, 15000, 17000],
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
-
-            // Future Prediction Chart
-            new Chart(document.getElementById('futurePredictionChart'), {
-                type: 'line',
-                data: {
-                    labels: ['Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-                    datasets: [{
-                        label: 'Previsão de Gastos',
-                        data: [2900, 3000, 3100, 3200, 3300, 3400],
-                        borderColor: 'rgba(255, 159, 64, 1)',
-                        fill: false
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false
-                }
-            });
+      },
+      scales: {
+        y: {
+          beginAtZero: true
         }
+      }
+    }
+  });
 
-        // Initialize charts on page load
-        document.addEventListener('DOMContentLoaded', initCharts);
-
-        // Simulated data update (replace with actual data fetching logic)
-        function updateDashboardData() {
-            document.getElementById('currentBalance').textContent = 'R$ ' + (Math.random() * 10000).toFixed(2);
-            document.getElementById('monthlyIncome').textContent = 'R$ ' + (Math.random() * 5000).toFixed(2);
-            document.getElementById('monthlyExpenses').textContent = 'R$ ' + (Math.random() * 4000).toFixed(2);
+  // Expenses Chart
+  const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+  new Chart(expensesCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Moradia', 'Alimentação', 'Transporte', 'Lazer', 'Outros'],
+      datasets: [{
+        data: [1500, 1000, 500, 600, 400],
+        backgroundColor: [
+          '#FF6384',
+          '#36A2EB',
+          '#FFCE56',
+          '#4BC0C0',
+          '#9966FF'
+        ]
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
         }
+      }
+    }
+  });
 
-        // Update dashboard data every 5 seconds (for demonstration purposes)
-        setInterval(updateDashboardData, 5000);
+  // Load recent transactions
+  loadRecentTransactions();
+  loadUpcomingPayments();
+});
 
-        // Financial tips rotation
-        const tips = [
-            "Considere criar um fundo de emergência para cobrir 3 a 6 meses de despesas.",
-            "Tente poupar pelo menos 20% da sua renda mensal para objetivos de longo prazo.",
-            "Revise suas assinaturas e serviços mensais. Cancele os que você não usa com frequência.",
-            "Estabeleça metas financeiras específicas e mensuráveis para o próximo ano.",
-            "Invista em sua educação financeira. Leia livros ou faça cursos sobre finanças pessoais."
-        ];
+function loadRecentTransactions() {
+  const transactions = [
+    {
+      date: '15/01/2024',
+      description: 'Supermercado Extra',
+      amount: -450.00,
+      category: 'Alimentação'
+    },
+    {
+      date: '14/01/2024',
+      description: 'Salário',
+      amount: 8500.00,
+      category: 'Receita'
+    },
+    {
+      date: '13/01/2024',
+      description: 'Netflix',
+      amount: -55.90,
+      category: 'Entretenimento'
+    }
+  ];
 
-        function rotateTips() {
-            const tipElement = document.getElementById('financialTip');
-            tipElement.textContent = tips[Math.floor(Math.random() * tips.length)];
-        }
+  const container = document.querySelector('.recent-transactions');
+  transactions.forEach(transaction => {
+    const item = document.createElement('div');
+    item.className = 'transaction-item';
+    item.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${transaction.description}</strong>
+          <br>
+          <small class="text-muted">${transaction.date} - ${transaction.category}</small>
+        </div>
+        <span class="text-${transaction.amount > 0 ? 'success' : 'danger'}">
+          ${transaction.amount > 0 ? '+' : ''}R$ ${Math.abs(transaction.amount).toFixed(2)}
+        </span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
 
-        // Rotate tips every 30 seconds
-        setInterval(rotateTips, 30000);
+function loadUpcomingPayments() {
+  const payments = [
+    {
+      description: 'Aluguel',
+      dueDate: '25/01/2024',
+      amount: 2500.00
+    },
+    {
+      description: 'Conta de Luz',
+      dueDate: '20/01/2024',
+      amount: 180.00
+    },
+    {
+      description: 'Internet',
+      dueDate: '18/01/2024',
+      amount: 120.00
+    }
+  ];
 
-        // Initial tip rotation
-        rotateTips();
-    </script>
-</body>
-</html>
+  const container = document.querySelector('.list-group');
+  payments.forEach(payment => {
+    const item = document.createElement('div');
+    item.className = 'list-group-item bg-transparent border-0 ps-0 pe-0';
+    item.innerHTML = `
+      <div class="d-flex justify-content-between align-items-center">
+        <div>
+          <strong>${payment.description}</strong>
+          <br>
+          <small class="text-muted">Vencimento: ${payment.dueDate}</small>
+        </div>
+        <span class="text-danger">
+          R$ ${payment.amount.toFixed(2)}
+        </span>
+      </div>
+    `;
+    container.appendChild(item);
+  });
+}
+</script>
+
+</body></html>

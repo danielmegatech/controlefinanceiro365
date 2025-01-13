@@ -1,7 +1,7 @@
-<html><head><base href="/login">
+<html><head><base href="/login/register">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Sistema Financeiro</title>
+    <title>Registro | Sistema Financeiro</title>
     
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -24,17 +24,18 @@
       justify-content: center;
     }
     
-    .login-container {
+    .register-container {
       width: 100%;
-      max-width: 400px;
+      max-width: 500px;
       padding: 2rem;
     }
     
-    .login-card {
+    .register-card {
       background: rgba(255,255,255,0.05);
       border-radius: 15px;
       padding: 2rem;
       border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
     }
     
     .form-control {
@@ -65,7 +66,7 @@
       background: #d91c41;
     }
     
-    .social-login {
+    .social-signup {
       display: flex;
       gap: 1rem;
       justify-content: center;
@@ -132,34 +133,77 @@
       -webkit-text-fill-color: transparent;
       font-weight: bold;
     }
+    
+    .password-strength {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      margin-top: 0.5rem;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .password-strength-bar {
+      height: 100%;
+      width: 0;
+      transition: all 0.3s ease;
+    }
+    
+    .strength-text {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.6);
+      margin-top: 0.25rem;
+    }
+    
+    .form-check-input:checked {
+      background-color: var(--primary);
+      border-color: var(--primary);
+    }
     </style>
     </head>
     <body>
     
-    <div class="login-container">
+    <div class="register-container">
       <div class="text-center mb-4">
-        <h2 class="gradient-text">Sistema Financeiro</h2>
-        <p class="text-muted">Faça login para continuar</p>
+        <h2 class="gradient-text">Criar Conta</h2>
+        <p class="text-muted">Junte-se ao Sistema Financeiro</p>
       </div>
       
-      <div class="login-card">
-        <div class="social-login mb-4">
-          <a href="#" class="social-btn" title="Login com Google">
+      <div class="register-card">
+        <div class="social-signup mb-4">
+          <a href="#" class="social-btn" title="Registrar com Google">
             <i class="fab fa-google"></i>
           </a>
-          <a href="#" class="social-btn" title="Login com Facebook">
+          <a href="#" class="social-btn" title="Registrar com Facebook">
             <i class="fab fa-facebook-f"></i>
           </a>
-          <a href="#" class="social-btn" title="Login com Apple">
+          <a href="#" class="social-btn" title="Registrar com Apple">
             <i class="fab fa-apple"></i>
           </a>
         </div>
         
         <div class="divider">
-          <span>ou continue com email</span>
+          <span>ou registre-se com email</span>
         </div>
         
-        <form id="loginForm" onsubmit="return handleLogin(event)">
+        <form id="registerForm" onsubmit="return handleRegister(event)">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="firstName" placeholder="Nome" required>
+                <label for="firstName">Nome</label>
+                <div class="error-message" id="firstNameError"></div>
+              </div>
+            </div>
+            
+            <div class="col-md-6 mb-3">
+              <div class="form-floating">
+                <input type="text" class="form-control" id="lastName" placeholder="Sobrenome" required>
+                <label for="lastName">Sobrenome</label>
+                <div class="error-message" id="lastNameError"></div>
+              </div>
+            </div>
+          </div>
+          
           <div class="form-floating mb-3">
             <input type="email" class="form-control" id="email" placeholder="nome@exemplo.com" required>
             <label for="email">Email</label>
@@ -170,62 +214,99 @@
             <input type="password" class="form-control" id="password" placeholder="Senha" required>
             <label for="password">Senha</label>
             <i class="fas fa-eye password-toggle" id="passwordToggle"></i>
+            <div class="password-strength">
+              <div class="password-strength-bar" id="strengthBar"></div>
+            </div>
+            <div class="strength-text" id="strengthText">Força da senha</div>
             <div class="error-message" id="passwordError"></div>
           </div>
           
-          <div class="d-flex justify-content-between mb-4">
+          <div class="form-floating mb-4">
+            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirmar Senha" required>
+            <label for="confirmPassword">Confirmar Senha</label>
+            <div class="error-message" id="confirmPasswordError"></div>
+          </div>
+          
+          <div class="mb-4">
             <div class="form-check">
-              <input type="checkbox" class="form-check-input" id="remember">
-              <label class="form-check-label" for="remember">Lembrar-me</label>
+              <input type="checkbox" class="form-check-input" id="terms" required>
+              <label class="form-check-label" for="terms">
+                Eu concordo com os <a href="#" class="text-primary">Termos de Serviço</a> e <a href="#" class="text-primary">Política de Privacidade</a>
+              </label>
             </div>
-            <a href="/forgot-password" class="text-primary text-decoration-none">Esqueceu a senha?</a>
           </div>
           
           <button type="submit" class="btn btn-primary w-100 mb-3">
-            <i class="fas fa-sign-in-alt me-2"></i>Entrar
+            <i class="fas fa-user-plus me-2"></i>Criar Conta
           </button>
           
           <p class="text-center mb-0">
-            Não tem uma conta? <a href="/register" class="text-primary text-decoration-none">Registre-se</a>
+            Já tem uma conta? <a href="/login" class="text-primary text-decoration-none">Faça login</a>
           </p>
         </form>
       </div>
     </div>
     
     <script>
-    function handleLogin(event) {
+    function handleRegister(event) {
       event.preventDefault();
       
       // Reset error messages
       document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
       
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const remember = document.getElementById('remember').checked;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const terms = document.getElementById('terms').checked;
       
-      // Simple validation
       let hasError = false;
       
-      if (!email.includes('@')) {
-        document.getElementById('emailError').textContent = 'Email inválido';
-        document.getElementById('emailError').style.display = 'block';
+      // Validation
+      if (firstName.length < 2) {
+        showError('firstNameError', 'Nome deve ter pelo menos 2 caracteres');
         hasError = true;
       }
       
-      if (password.length < 6) {
-        document.getElementById('passwordError').textContent = 'Senha deve ter pelo menos 6 caracteres';
-        document.getElementById('passwordError').style.display = 'block';
+      if (lastName.length < 2) {
+        showError('lastNameError', 'Sobrenome deve ter pelo menos 2 caracteres');
+        hasError = true;
+      }
+      
+      if (!email.includes('@')) {
+        showError('emailError', 'Email inválido');
+        hasError = true;
+      }
+      
+      if (password.length < 8) {
+        showError('passwordError', 'Senha deve ter pelo menos 8 caracteres');
+        hasError = true;
+      }
+      
+      if (password !== confirmPassword) {
+        showError('confirmPasswordError', 'As senhas não coincidem');
+        hasError = true;
+      }
+      
+      if (!terms) {
+        alert('Você deve aceitar os termos e condições');
         hasError = true;
       }
       
       if (!hasError) {
-        // Here you would typically make an API call to authenticate
-        // For demo purposes, we'll simulate a successful login
-        localStorage.setItem('isLoggedIn', 'true');
-        window.location.href = '/dashboard';
+        // Here you would typically make an API call to register
+        localStorage.setItem('isRegistered', 'true');
+        window.location.href = '/login';
       }
       
       return false;
+    }
+    
+    function showError(elementId, message) {
+      const errorEl = document.getElementById(elementId);
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
     }
     
     // Password visibility toggle
@@ -244,9 +325,39 @@
       }
     });
     
+    // Password strength meter
+    document.getElementById('password').addEventListener('input', function() {
+      const password = this.value;
+      const strengthBar = document.getElementById('strengthBar');
+      const strengthText = document.getElementById('strengthText');
+      
+      let strength = 0;
+      
+      if (password.length >= 8) strength += 25;
+      if (password.match(/[A-Z]/)) strength += 25;
+      if (password.match(/[0-9]/)) strength += 25;
+      if (password.match(/[^A-Za-z0-9]/)) strength += 25;
+      
+      strengthBar.style.width = strength + '%';
+      
+      if (strength <= 25) {
+        strengthBar.style.backgroundColor = '#ff4444';
+        strengthText.textContent = 'Senha fraca';
+      } else if (strength <= 50) {
+        strengthBar.style.backgroundColor = '#ffa700';
+        strengthText.textContent = 'Senha média';
+      } else if (strength <= 75) {
+        strengthBar.style.backgroundColor = '#00C851';
+        strengthText.textContent = 'Senha forte';
+      } else {
+        strengthBar.style.backgroundColor = '#007E33';
+        strengthText.textContent = 'Senha muito forte';
+      }
+    });
+    
     // Animate form elements entrance
     document.addEventListener('DOMContentLoaded', () => {
-      const elements = document.querySelectorAll('.login-card > *');
+      const elements = document.querySelectorAll('.register-card > *');
       elements.forEach((el, i) => {
         el.style.opacity = '0';
         el.style.transform = 'translateY(20px)';
@@ -271,27 +382,6 @@
           hsl(${190 + x * 20}, 85%, 35%)
         )
       `;
-    });
-    
-    // Simple form validation while typing
-    document.getElementById('email').addEventListener('input', function() {
-      const errorEl = document.getElementById('emailError');
-      if (this.value && !this.value.includes('@')) {
-        errorEl.textContent = 'Email inválido';
-        errorEl.style.display = 'block';
-      } else {
-        errorEl.style.display = 'none';
-      }
-    });
-    
-    document.getElementById('password').addEventListener('input', function() {
-      const errorEl = document.getElementById('passwordError');
-      if (this.value && this.value.length < 6) {
-        errorEl.textContent = 'Senha deve ter pelo menos 6 caracteres';
-        errorEl.style.display = 'block';
-      } else {
-        errorEl.style.display = 'none';
-      }
     });
     </script>
     </body></html>
